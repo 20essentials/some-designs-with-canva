@@ -9,10 +9,10 @@ export default defineConfig({
     assets: 'static'
   },
 
-  base: import.meta.env.DEV ? undefined : '/designs-with-canva-part-2/',
+  base: import.meta.env.DEV ? undefined : '/some-designs-with-canva/',
   site: import.meta.env.DEV
     ? 'http://localhost:4321/'
-    : 'https://20essentials.github.io/designs-with-canva-part-2/',
+    : 'https://20essentials.github.io/some-designs-with-canva/',
 
   integrations: [react()]
 });

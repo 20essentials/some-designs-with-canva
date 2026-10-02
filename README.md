@@ -1,2 +1,1 @@
-[![Foto Preview](preview/designs-with-canva-part-2.avif)](https://20essentials.github.io/designs-with-canva-part-2)
-
+[![Foto Preview](preview/some-designs-with-canva.avif)](https://20essentials.github.io/some-designs-with-canva)
