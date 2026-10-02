@@ -768,6 +768,145 @@ export const arrayCards = [
     localImage: '/assets/split-screen-effect.avif',
     id: '115'
   },
+  {
+    title: 'BlendBackground',
+    canvaWeb:
+      'https://www.canva.com/design/DAG2n-2OuBk/nU7nnQF_S6Ai2eupuhbFFA/view?utm_content=DAG2n-2OuBk&utm_campaign=designshare&utm_medium=link2&utm_source=uniquelinks&utlId=ha3bfe6b554',
+    localImage: '/assets/blend-background.avif',
+    id: '116'
+  },
+  {
+    title: 'Simple Video',
+    canvaWeb:
+      'https://www.canva.com/design/DAG2n6nBGII/OSXYw67_kYZA-i-5u8z-6g/view?utm_content=DAG2n6nBGII&utm_campaign=designshare&utm_medium=link2&utm_source=uniquelinks&utlId=he37c90bad6',
+    localImage: '/assets/simple-video.avif',
+    id: '117'
+  },
+  {
+    title: 'Concept Map',
+    canvaWeb:
+      'https://www.canva.com/design/DAG2n3B3EBM/_sx5e32Z2b_3eOn9Qz350g/view?utm_content=DAG2n3B3EBM&utm_campaign=designshare&utm_medium=link2&utm_source=uniquelinks&utlId=h5129bb0d68',
+    localImage: '/assets/concept-map.avif',
+    id: '118'
+  },
+  {
+    title: 'Synoptic Table',
+    canvaWeb:
+      'https://www.canva.com/design/DAG2n7oBg5A/dId9d62G6LgZCmFAYVTR9g/view?utm_content=DAG2n7oBg5A&utm_campaign=designshare&utm_medium=link2&utm_source=uniquelinks&utlId=h73417441f8',
+    localImage: '/assets/synoptic-table.avif',
+    id: '119'
+  },
+  {
+    title: 'Simple Table',
+    canvaWeb:
+      'https://www.canva.com/design/DAG2n5d1PZA/7FvGBAqsLxDf1sEcitsxkA/view?utm_content=DAG2n5d1PZA&utm_campaign=designshare&utm_medium=link2&utm_source=uniquelinks&utlId=he957c97212',
+    localImage: '/assets/simple-table.avif',
+    id: '120'
+  },
+  {
+    title: 'A4 Doc',
+    canvaWeb:
+      'https://www.canva.com/design/DAG2oEqDkEU/GnBY0GSyzh1mCueZlRP7Qg/view?utm_content=DAG2oEqDkEU&utm_campaign=designshare&utm_medium=link2&utm_source=uniquelinks&utlId=h88a8c93df6',
+    localImage: '/assets/a4-doc.avif',
+    id: '121'
+  },
+  {
+    title: 'Flowchart',
+    canvaWeb:
+      'https://www.canva.com/design/DAG2oHHCIvQ/Jrair-f7Qn_3zAfcNCm4eg/view?utm_content=DAG2oHHCIvQ&utm_campaign=designshare&utm_medium=link2&utm_source=uniquelinks&utlId=hda5d506fba',
+    localImage: '/assets/flowchart.avif',
+    id: '122'
+  },
+  {
+    title: 'Book FrontPage',
+    canvaWeb:
+      'https://www.canva.com/design/DAG2oMZ9IRY/6uYKoTr8b5pwBNNMRhDgOQ/view?utm_content=DAG2oMZ9IRY&utm_campaign=designshare&utm_medium=link2&utm_source=uniquelinks&utlId=h29d6fab853',
+    localImage: '/assets/book-front-page.avif',
+    id: '123'
+  },
+  {
+    title: 'eBook',
+    canvaWeb:
+      'https://www.canva.com/design/DAG2oPqIlBM/-ynvs_l40374zCnNx2wiaA/view?utm_content=DAG2oPqIlBM&utm_campaign=designshare&utm_medium=link2&utm_source=uniquelinks&utlId=hba11ecfde8',
+    localImage: '/assets/ebook.avif',
+    id: '124'
+  },
+  {
+    title: 'Chart',
+    canvaWeb:
+      'https://www.canva.com/design/DAG2oDETl0s/flJ9YgMEdk4O-A8vcRkSKA/view?utm_content=DAG2oDETl0s&utm_campaign=designshare&utm_medium=link2&utm_source=uniquelinks&utlId=heb9874381d',
+    localImage: '/assets/chart.avif',
+    id: '125'
+  },
+  {
+    title: 'PPT',
+    canvaWeb:
+      'https://www.canva.com/design/DAG2vNa-HFs/u-AbJOqnjs2U6KW42hbjkA/view?utm_content=DAG2vNa-HFs&utm_campaign=designshare&utm_medium=link2&utm_source=uniquelinks&utlId=he6c94c0360',
+    localImage: '/assets/ppt.avif',
+    id: '126'
+  },
+  {
+    title: 'Presentation With Transitions',
+    canvaWeb:
+      'https://www.canva.com/design/DAG2vO8kSqg/axGvCLECRzvXfFGDJ5DQKw/view?utm_content=DAG2vO8kSqg&utm_campaign=designshare&utm_medium=link2&utm_source=uniquelinks&utlId=h627985ee31',
+    localImage: '/assets/presentation-with-transitions.avif',
+    id: '127'
+  },
+  {
+    title: 'Captions / Subtitles in a Video',
+    canvaWeb:
+      'https://www.canva.com/design/DAG2vasnUYw/9oz-RYMbExs-G6z21teKfA/watch?utm_content=DAG2vasnUYw&utm_campaign=designshare&utm_medium=link2&utm_source=uniquelinks&utlId=h0a3dd36954',
+    localImage: '/assets/captions.avif',
+    id: '128'
+  },
+  {
+    title: 'Banner',
+    canvaWeb:
+      'https://www.canva.com/design/DAG2vWeh3vY/5AswHb9mNB5nEb0dCGtKXA/view?utm_content=DAG2vWeh3vY&utm_campaign=designshare&utm_medium=link2&utm_source=uniquelinks&utlId=h61820bfec8',
+    localImage: '/assets/banner.avif',
+    id: '129'
+  },
+  {
+    title: 'Images on Slide Practice',
+    canvaWeb:
+      'https://www.canva.com/design/DAG2vaDmJ4U/mrl-0Y7HneVmYRtIdX42dQ/view?utm_content=DAG2vaDmJ4U&utm_campaign=designshare&utm_medium=link2&utm_source=uniquelinks&utlId=h36ec7a12dd#1',
+    localImage: '/assets/images-on-slide.avif',
+    id: '130'
+  },
+  {
+    title: '404 Video',
+    canvaWeb:
+      'https://www.canva.com/design/DAG2vYIJiYA/Y9zpPauH86ClirQVPHxygw/view?utm_content=DAG2vYIJiYA&utm_campaign=designshare&utm_medium=link2&utm_source=uniquelinks&utlId=h0b2e172517',
+    localImage: '/assets/404-video.avif',
+    id: '131'
+  },
+  {
+    title: 'Simple WebSite',
+    canvaWeb: 'https://simpl3-w3bsite-on-canv4.my.canva.site/',
+    localImage: '/assets/simple-website.avif',
+    id: '132'
+  },
+  {
+    title: 'The End Poster',
+    canvaWeb:
+      'https://www.canva.com/design/DAG2vSaIHqw/nFCpgv4UHEtNK3DXtbrfCw/view?utm_content=DAG2vSaIHqw&utm_campaign=designshare&utm_medium=link2&utm_source=uniquelinks&utlId=h01d58d2cd3',
+    localImage: '/assets/the-end.avif',
+    id: '133'
+  },
+  {
+    title: 'Template Calendar Sheet',
+    canvaWeb:
+      'https://www.canva.com/design/DAG2vTi1QM8/a5L3Dk9l25CP4PduP4b9vQ/view?utm_content=DAG2vTi1QM8&utm_campaign=designshare&utm_medium=link2&utm_source=uniquelinks&utlId=hb84a9cd844',
+    localImage: '/assets/template-calendar-sheet.avif',
+    id: '134'
+  },
+  {
+    title: 'Slider Animation',
+    canvaWeb:
+      'https://www.canva.com/design/DAG2vb3vc3Y/feln63d1PzDGNiNzB_KbfQ/view?utm_content=DAG2vb3vc3Y&utm_campaign=designshare&utm_medium=link2&utm_source=uniquelinks&utlId=hf18704284f',
+    localImage: '/assets/slider-animation.avif',
+    id: '135'
+  },
 ];
 
 
