@@ -1,4 +1,4 @@
-import './FlyingPosters.css';
+import './flying-posters.css';
 import { useRef, useEffect } from 'react';
 export type ArrayItem = { srcImage: string; web: string }[];
 import {

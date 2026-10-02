@@ -1,5 +1,5 @@
 import { baseUrl } from '@/utils/functions';
-import FlyingPosters from './FlyingPosters';
+import FlyingPosters from './flying-posters';
 import { arrayCards } from '@/utils/data';
 
 const items = arrayCards
