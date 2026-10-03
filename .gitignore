@@ -1,7 +1,7 @@
 # build output
 dist/
 .opencode/
-
+AGENTS.md
 
 # generated types
 .astro/
