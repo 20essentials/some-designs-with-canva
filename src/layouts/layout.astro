@@ -1,18 +1,34 @@
 ---
-import { lengthOfProjects } from '@/utils/data';
-const title = `${lengthOfProjects} Designs With Canva`;
 import '@/styles/global.css';
+import { lengthOfProjects } from '@/utils/data';
 import { baseUrl } from '@/utils/functions';
-const favicon = baseUrl('/assets/favicon.webp');
+
+const count = lengthOfProjects;
+const title = `${count} Designs With Canva`;
+const description = `A running archive of ${count} experiments made inside Canva — apps, motion, 3D and layout studies. Every tile opens in the editor where it was built.`;
 ---
+
 <!doctype html>
 <html lang='en'>
   <head>
     <meta charset='UTF-8' />
-    <meta name='viewport' content='width=device-width' />
-    <link rel='icon' type='image/svg+xml' href={favicon} />
+    <meta name='viewport' content='width=device-width, initial-scale=1' />
     <meta name='google' content='notranslate' />
+    <meta name='theme-color' content='#0b0614' />
+    <meta name='description' content={description} />
+
+    <meta property='og:type' content='website' />
+    <meta property='og:title' content={title} />
+    <meta property='og:description' content={description} />
+    <meta property='og:image' content={baseUrl('/assets/3d-inflatable.avif')} />
+    <meta name='twitter:card' content='summary_large_image' />
+
+    <link rel='icon' type='image/webp' href={baseUrl('/assets/favicon.webp')} />
     <title>{title}</title>
+
+    <script is:inline>
+      document.documentElement.classList.add('js');
+    </script>
   </head>
   <body>
     <slot />

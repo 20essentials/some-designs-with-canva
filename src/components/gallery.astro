@@ -1,0 +1,559 @@
+---
+import { categories, projects } from '@/utils/taxonomy';
+import { baseUrl } from '@/utils/functions';
+
+const total = projects.length;
+const first = projects[0].id;
+const last = projects[projects.length - 1].id;
+---
+
+<section class='archive' id='archive' aria-labelledby='archive-heading'>
+  <div class='archive__bar'>
+    <div class='archive__ident'>
+      <h2 class='archive__label' id='archive-heading'>Archive</h2>
+      <span class='archive__range' aria-hidden='true'>
+        {first}&thinsp;&ndash;&thinsp;{last}
+      </span>
+    </div>
+
+    <div class='archive__filters' role='group' aria-label='Filter designs by kind'>
+      {
+        categories.map(({ id, label, count }) => (
+          <button
+            type='button'
+            class='archive__filter'
+            data-filter={id}
+            aria-pressed={id === 'all' ? 'true' : 'false'}
+          >
+            <span class='archive__filter-label'>{label}</span>
+            <span class='archive__filter-count' aria-hidden='true'>{count}</span>
+          </button>
+        ))
+      }
+    </div>
+
+    <p class='archive__status' role='status'>
+      {total} of {total} designs
+    </p>
+  </div>
+
+  <ul class='archive__grid' data-grid>
+    {
+      projects.map((project, i) => (
+        <li
+          class={`archive__tile archive__tile--d${i % 5} archive__tile--t${i % 3} archive__tile--s${i % 4}`}
+          data-tile
+          data-cat={project.category}
+        >
+          <a
+            class='archive__card'
+            href={project.href}
+            target='_blank'
+            rel='noopener noreferrer'
+            aria-label={`Open ${project.title} in Canva`}
+          >
+            <span class='archive__frame'>
+              <img
+                class='archive__image'
+                src={baseUrl(project.image)}
+                alt=''
+                width={900}
+                height={1600}
+                loading='lazy'
+                decoding='async'
+              />
+            </span>
+            <span class='archive__index' aria-hidden='true'>{project.id}</span>
+            <span class='archive__meta' aria-hidden='true'>
+              <span class='archive__title'>{project.title}</span>
+              <span class='archive__cue'>Open in Canva</span>
+            </span>
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</section>
+
+<style>
+  .archive {
+    position: relative;
+    padding: 0 var(--gutter) clamp(5rem, 12vh, 9rem);
+    background:
+      radial-gradient(
+        80% 45% at 50% 0%,
+        color-mix(in oklab, var(--violet) 12%, transparent) 0%,
+        transparent 65%
+      ),
+      linear-gradient(
+        to bottom,
+        transparent 0%,
+        color-mix(in oklab, var(--ink-deep) 92%, transparent) 22%
+      );
+  }
+
+  /* Bar ---------------------------------------------------------------- */
+
+  .archive__bar {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem clamp(1rem, 3vw, 2.5rem);
+    min-height: var(--bar-height);
+    padding-block: 0.7rem;
+    margin-bottom: clamp(1.75rem, 4vw, 3rem);
+    background: color-mix(in oklab, var(--ink) 82%, transparent);
+    backdrop-filter: blur(14px) saturate(1.3);
+    border-bottom: 1px solid var(--edge-soft);
+  }
+
+  .archive__ident {
+    display: flex;
+    align-items: baseline;
+    gap: 0.7rem;
+    flex-shrink: 0;
+  }
+
+  .archive__label {
+    font-family: var(--font-display);
+    font-size: clamp(1.05rem, 1.4vw, 1.35rem);
+    letter-spacing: 0.01em;
+    color: var(--paper);
+  }
+
+  .archive__range,
+  .archive__status {
+    font-size: 0.78rem;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.08em;
+    color: var(--paper-dim);
+  }
+
+  .archive__status {
+    margin-left: auto;
+    flex-shrink: 0;
+  }
+
+  .archive__filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+
+  .archive__filter {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.45em;
+    padding: 0.34em 0.7em;
+    font-size: 0.82rem;
+    line-height: 1.2;
+    color: var(--paper-dim);
+    border: 1px solid var(--edge-soft);
+    border-radius: 2px;
+    transition:
+      color 160ms var(--ease-out),
+      border-color 160ms var(--ease-out),
+      background-color 160ms var(--ease-out);
+  }
+
+  .archive__filter-count {
+    font-size: 0.72em;
+    font-variant-numeric: tabular-nums;
+    color: color-mix(in oklab, var(--paper-dim) 65%, transparent);
+    transition: color 160ms var(--ease-out);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .archive__filter:hover {
+      color: var(--paper);
+      border-color: var(--edge);
+      background: var(--edge-soft);
+    }
+  }
+
+  .archive__filter[aria-pressed='true'] {
+    color: var(--ink);
+    background: var(--paper);
+    border-color: var(--paper);
+  }
+
+  .archive__filter[aria-pressed='true'] .archive__filter-count {
+    color: color-mix(in oklab, var(--ink) 60%, transparent);
+  }
+
+  /* Wall --------------------------------------------------------------- */
+
+  .archive__grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--gap);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .archive__tile {
+    --px: 0px;
+    --py: 0px;
+    --stagger: 0ms;
+    --depth: 0px;
+    --tilt: 0deg;
+    --lift: 0px;
+
+    position: relative;
+    min-width: 0;
+    transform: perspective(900px)
+      translate3d(var(--px), var(--py), var(--depth));
+    transition:
+      transform 460ms var(--ease-out),
+      opacity 620ms var(--ease-out) var(--stagger);
+  }
+
+  .archive__tile--d0 {
+    --depth: -32px;
+  }
+  .archive__tile--d1 {
+    --depth: -16px;
+  }
+  .archive__tile--d3 {
+    --depth: 16px;
+  }
+  .archive__tile--d4 {
+    --depth: 32px;
+  }
+
+  .archive__tile--t1 {
+    --tilt: 0.85deg;
+  }
+  .archive__tile--t2 {
+    --tilt: -0.85deg;
+  }
+
+  .archive__tile--s1 {
+    --stagger: 50ms;
+  }
+  .archive__tile--s2 {
+    --stagger: 100ms;
+  }
+  .archive__tile--s3 {
+    --stagger: 150ms;
+  }
+
+  .archive__tile[hidden] {
+    display: none;
+  }
+
+  :global(html.js) .archive__tile {
+    opacity: 0;
+  }
+
+  :global(html.js) .archive__tile.is-in {
+    opacity: 1;
+  }
+
+  /* Card --------------------------------------------------------------- */
+
+  .archive__card {
+    display: block;
+    position: relative;
+    min-width: 0;
+    border-radius: 3px;
+    border: 1px solid var(--edge-soft);
+    overflow: hidden;
+    background: var(--ink-raised);
+    transform: perspective(760px)
+      rotate(var(--tilt))
+      translate3d(0, 0, var(--lift));
+    transition:
+      transform 200ms var(--ease-out),
+      border-color 200ms var(--ease-out),
+      box-shadow 200ms var(--ease-out);
+  }
+
+  .archive__frame {
+    display: block;
+    min-width: 0;
+    aspect-ratio: 3 / 4;
+    overflow: hidden;
+  }
+
+  .archive__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 50% 18%;
+    transition: transform 320ms var(--ease-out);
+  }
+
+  .archive__index {
+    position: absolute;
+    top: 0.5rem;
+    left: 0.6rem;
+    font-size: 0.7rem;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.1em;
+    color: color-mix(in oklab, var(--paper) 62%, transparent);
+    text-shadow: 0 1px 6px color-mix(in oklab, var(--ink-deep) 80%, transparent);
+    pointer-events: none;
+  }
+
+  .archive__meta {
+    position: absolute;
+    inset: auto 0 0 0;
+    display: grid;
+    gap: 0.2rem;
+    padding: 2.4rem 0.7rem 0.7rem;
+    background: linear-gradient(
+      to top,
+      color-mix(in oklab, var(--ink-deep) 94%, transparent) 0%,
+      color-mix(in oklab, var(--ink-deep) 55%, transparent) 45%,
+      transparent 100%
+    );
+    opacity: 0;
+    transform: translate3d(0, 8px, 0);
+    transition:
+      opacity 200ms var(--ease-out),
+      transform 200ms var(--ease-out);
+  }
+
+  .archive__title {
+    min-width: 0;
+    font-size: 0.82rem;
+    font-weight: 600;
+    line-height: 1.25;
+    color: var(--paper);
+    overflow-wrap: anywhere;
+    text-shadow: 0 1px 8px color-mix(in oklab, var(--ink-deep) 70%, transparent);
+  }
+
+  .archive__cue {
+    font-size: 0.7rem;
+    letter-spacing: 0.04em;
+    color: var(--cyan);
+    text-shadow: 0 1px 8px color-mix(in oklab, var(--ink-deep) 70%, transparent);
+  }
+
+  /* No hover to reveal with, so labels stay on. */
+  @media (hover: none) {
+    .archive__meta {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  /* A preview that will not decode still has to be a legible card. */
+  .archive__tile.is-broken .archive__frame {
+    background:
+      repeating-linear-gradient(
+        -45deg,
+        var(--edge-soft) 0 1px,
+        transparent 1px 9px
+      ),
+      var(--ink-raised);
+  }
+
+  .archive__tile.is-broken .archive__meta {
+    opacity: 1;
+    transform: none;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .archive__tile:hover,
+    .archive__tile:focus-within {
+      z-index: 3;
+    }
+
+    .archive__tile:hover {
+      --tilt: 0deg;
+      --lift: 78px;
+    }
+
+    .archive__tile:hover .archive__card {
+      border-color: var(--edge-hot);
+      box-shadow: 7px 7px 0 var(--magenta);
+    }
+
+    .archive__tile:hover .archive__image {
+      transform: scale(1.04);
+    }
+
+    .archive__tile:hover .archive__meta,
+    .archive__tile:focus-within .archive__meta {
+      opacity: 1;
+      transform: translate3d(0, 0, 0);
+    }
+  }
+
+  .archive__tile:focus-within {
+    --tilt: 0deg;
+    --lift: 78px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .archive__tile,
+    .archive__card,
+    .archive__image,
+    .archive__meta {
+      transition-duration: 1ms;
+    }
+  }
+
+  /* Columns ------------------------------------------------------------ */
+
+  @media (min-width: 34em) {
+    .archive__grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 56em) {
+    .archive__grid {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 80em) {
+    .archive__grid {
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 105em) {
+    .archive__grid {
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+    }
+  }
+</style>
+
+<script>
+  const clamp = (value: number, min: number, max: number) =>
+    value < min ? min : value > max ? max : value;
+
+  const grid = document.querySelector<HTMLElement>('[data-grid]');
+  const tiles = grid
+    ? [...grid.querySelectorAll<HTMLElement>('[data-tile]')]
+    : [];
+
+  const total = tiles.length;
+  const buttons = [
+    ...document.querySelectorAll<HTMLButtonElement>('[data-filter]')
+  ];
+  const status = document.querySelector<HTMLElement>('.archive__status');
+
+  /* Entrance: opacity only, staggered by column bucket — one coordinated
+     reveal per row rather than a delay on every tile. */
+  if ('IntersectionObserver' in window) {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (!entry.isIntersecting) continue;
+          entry.target.classList.add('is-in');
+          observer.unobserve(entry.target);
+        }
+      },
+      { rootMargin: '0px 0px -8% 0px', threshold: 0.01 }
+    );
+    tiles.forEach((tile) => observer.observe(tile));
+  } else {
+    tiles.forEach((tile) => tile.classList.add('is-in'));
+  }
+
+  /* Cursor parallax: only tiles inside the viewport get written, so a frame
+     costs ~20 style writes instead of 135. Depth is read back from the
+     stylesheet so --depth stays the single source of truth. */
+  const depth = new WeakMap<HTMLElement, number>();
+  const onScreen = new Set<HTMLElement>();
+  for (const tile of tiles) {
+    depth.set(
+      tile,
+      parseFloat(getComputedStyle(tile).getPropertyValue('--depth')) || 0
+    );
+  }
+
+  const viewport = new IntersectionObserver(
+    (entries) => {
+      for (const entry of entries) {
+        const tile = entry.target as HTMLElement;
+        if (entry.isIntersecting) onScreen.add(tile);
+        else onScreen.delete(tile);
+      }
+    },
+    { rootMargin: '25% 0px' }
+  );
+  tiles.forEach((tile) => viewport.observe(tile));
+
+  const canPoint = matchMedia('(hover: hover) and (pointer: fine)');
+  const calm = matchMedia('(prefers-reduced-motion: reduce)');
+  let pending = 0;
+
+  const onMove = (event: PointerEvent) => {
+    if (pending) return;
+    pending = requestAnimationFrame(() => {
+      pending = 0;
+      const x = clamp((event.clientX / innerWidth - 0.5) * 2, -1, 1);
+      const y = clamp((event.clientY / innerHeight - 0.5) * 2, -1, 1);
+      for (const tile of onScreen) {
+        const z = depth.get(tile)!;
+        tile.style.setProperty('--px', `${(x * z * 0.9).toFixed(1)}px`);
+        tile.style.setProperty('--py', `${(y * z * 0.5).toFixed(1)}px`);
+      }
+    });
+  };
+
+  const onReset = () => {
+    for (const tile of onScreen) {
+      tile.style.setProperty('--px', '0px');
+      tile.style.setProperty('--py', '0px');
+    }
+  };
+
+  if (canPoint.matches && !calm.matches) {
+    addEventListener('pointermove', onMove, { passive: true });
+    document.addEventListener('pointerleave', onReset);
+  }
+
+  /* Filters ------------------------------------------------------------ */
+
+  const apply = (filter: string) => {
+    const returning: HTMLElement[] = [];
+    let shown = 0;
+
+    for (const tile of tiles) {
+      const match = filter === 'all' || tile.dataset.cat === filter;
+      if (match && tile.hidden) returning.push(tile);
+      tile.hidden = !match;
+      if (match) shown += 1;
+    }
+
+    // Replay the entrance only for the tiles that came back.
+    returning.forEach((tile) => tile.classList.remove('is-in'));
+    requestAnimationFrame(() =>
+      returning.forEach((tile) => tile.classList.add('is-in'))
+    );
+
+    if (status) status.textContent = `${shown} of ${total} designs`;
+  };
+
+  for (const button of buttons) {
+    button.addEventListener('click', () => {
+      if (button.getAttribute('aria-pressed') === 'true') return;
+      buttons.forEach((other) =>
+        other.setAttribute('aria-pressed', String(other === button))
+      );
+      apply(button.dataset.filter!);
+    });
+  }
+
+  /* A preview that fails to decode should still read as a card. */
+  grid?.querySelectorAll<HTMLImageElement>('.archive__image').forEach((img) => {
+    const mark = () => img.closest('.archive__tile')?.classList.add('is-broken');
+    if (img.complete) {
+      if (img.naturalWidth === 0) mark();
+    } else {
+      img.addEventListener('error', mark, { once: true });
+    }
+  });
+</script>

@@ -1,74 +1,254 @@
 ---
-import { baseUrl } from '@/utils/functions';
 import { lengthOfProjects } from '@/utils/data';
-const title = `${lengthOfProjects} Some Designs With Canva`;
-const logo = baseUrl('/assets/canva-isotopic-logo.svg');
-const logo2 = baseUrl('/assets/scroll-img.png');
+
+const count = lengthOfProjects;
 ---
 
-<section class='am-hero'>
-  <h1>
-    {lengthOfProjects} Designs With <img
-      src={logo}
-      alt='Logo'
-      class='am-logo'
-    />anva
-  </h1>
+<section class='hero'>
+  <div class='hero__stack'>
+    <h1 class='hero__title'>
+      <span class='hero__line'><span class='hero__word'>{count} Designs</span></span>
+      <span class='hero__line'><span class='hero__word'>With Canva</span></span>
+    </h1>
 
-  <img src={logo2} alt='Logo' class='am-logo-scroll' />
+    <p class='hero__lede'>
+      A running archive of experiments made inside Canva. Every tile opens in
+      the editor where it was built.
+    </p>
+
+    <a class='hero__cue' href='#archive'>
+      <span>See the archive</span>
+      <svg viewBox='0 0 12 8' aria-hidden='true' focusable='false'>
+        <path d='M1 1.5 6 6.5l5-5' fill='none' stroke='currentColor' stroke-width='1.6' />
+      </svg>
+    </a>
+  </div>
 </section>
+
 <style>
-  .am-hero {
-    height: 100vh;
+  .hero {
+    --rim: clamp(0.5px, 0.14vw, 1.5px);
+    --rim-blur: clamp(1px, 0.3vw, 3px);
+    --rim-offset: clamp(2px, 0.55vw, 6px);
+
     position: relative;
-    pointer-events: none;
     display: grid;
     place-items: center;
+    min-height: 100svh;
+    padding: clamp(3rem, 8vh, 6rem) var(--gutter);
+    overflow: clip;
+    background:
+      radial-gradient(
+        120% 70% at 50% -10%,
+        color-mix(in oklab, var(--violet) 22%, transparent) 0%,
+        transparent 62%
+      ),
+      radial-gradient(
+        90% 55% at 50% 112%,
+        color-mix(in oklab, var(--magenta) 16%, transparent) 0%,
+        transparent 60%
+      ),
+      var(--ink);
   }
 
-  h1 {
-    font-family: 'Luckiest Guy', cursive;
-    font-size: 4vmax;
-    line-height: 1;
-    margin: 0;
-    color: hsl(293, 32%, 84%);
+  /* One orchestrated page-load moment: a light leak crosses the field,
+     the type lands, the rim-light tightens from cold to hot. */
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: -30% -60%;
+    background: radial-gradient(
+      38% 30% at 50% 50%,
+      color-mix(in oklab, var(--cyan) 34%, transparent) 0%,
+      transparent 70%
+    );
+    opacity: 0;
+    transform: translate3d(-42%, 0, 0) scale(0.7);
+    animation: hero-leak 1500ms var(--ease-out) 80ms both;
+    pointer-events: none;
+  }
+
+  .hero__stack {
+    position: relative;
+    display: grid;
+    justify-items: center;
+    gap: clamp(1.5rem, 3.5vh, 2.5rem);
+    max-width: 46ch;
     text-align: center;
-    letter-spacing: 0.039vmax;
-    --light-pos-x: 1.5;
-    --light-pos-y: -1.5;
-    --rim-size: 0.01vmax;
-    --shadow-offset: 0.104vmax;
-    --shadow-blur: 0.052vmax;
+  }
 
-    text-shadow:
-      calc(max(var(--rim-size), 0.065vmax) * var(--light-pos-x))
-        calc(max(var(--rim-size), 0.065vmax) * var(--light-pos-y))
-        hsl(307, 79%, 55%),
-      calc(max(var(--rim-size), 0.065vmax) * var(--light-pos-x) * -1)
-        calc(max(var(--rim-size), 0.065vmax) * var(--light-pos-y) * -1)
-        hsl(270, 56%, 50%),
-      calc(var(--shadow-offset) * var(--light-pos-x) * -1)
-        calc(var(--shadow-offset) * var(--light-pos-y) * -1) var(--shadow-blur)
-        hsl(0 0% 50% / 0.75);
+  .hero__title {
+    font-family: var(--font-display);
+    font-size: clamp(2.75rem, 11.5vw, 8.5rem);
+    line-height: 0.94;
+    letter-spacing: 0.005em;
+    color: var(--paper);
+    margin: 0;
+  }
 
-    @media (width <= 1111px) and (orientation: portrait) {
-      zoom: 0.7;
+  .hero__line {
+    display: block;
+    overflow: hidden;
+    padding-block: 0.04em;
+  }
+
+  .hero__word {
+    display: block;
+    animation:
+      hero-word 900ms var(--ease-out) both,
+      hero-rim 1100ms var(--ease-out) both;
+  }
+
+  .hero__line:nth-child(1) .hero__word {
+    animation-delay: 140ms, 140ms;
+  }
+
+  .hero__line:nth-child(2) .hero__word {
+    animation-delay: 230ms, 230ms;
+  }
+
+  .hero__lede {
+    max-width: 42ch;
+    font-size: clamp(0.98rem, 0.55vw + 0.85rem, 1.15rem);
+    color: var(--paper-dim);
+    text-wrap: balance;
+    animation: hero-rise 700ms var(--ease-out) 520ms both;
+  }
+
+  .hero__cue {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6em;
+    padding: 0.55em 1.05em;
+    font-size: 0.875rem;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    color: var(--paper);
+    border: 1px solid var(--edge);
+    border-radius: 2px;
+    background: color-mix(in oklab, var(--ink-raised) 55%, transparent);
+    animation: hero-rise 700ms var(--ease-out) 720ms both;
+    transition:
+      border-color 200ms var(--ease-out),
+      color 200ms var(--ease-out),
+      transform 200ms var(--ease-out);
+  }
+
+  .hero__cue svg {
+    width: 0.72em;
+    height: auto;
+    animation: hero-bob 2200ms linear 1400ms infinite;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .hero__cue:hover {
+      border-color: var(--edge-hot);
+      color: var(--cyan);
+      transform: translateY(-2px);
+    }
+
+    .hero__cue:hover svg {
+      animation-play-state: paused;
+      transform: translateY(2px);
     }
   }
 
-  .am-logo {
-    width: 4vmax;
-    position: relative;
-    top: 0.6vmax;
+  @keyframes hero-leak {
+    from {
+      opacity: 0;
+      transform: translate3d(-42%, 0, 0) scale(0.7);
+    }
+    35% {
+      opacity: 1;
+    }
+    to {
+      opacity: 0;
+      transform: translate3d(42%, 0, 0) scale(1.25);
+    }
   }
 
-  .am-logo-scroll {
-    width: 7vmax;
-    position: absolute;
-    right: 1.5vmax;
-    top: 1.5vmax;
-    border-radius: 0.5vmax;
-    overflow: hidden;
-    mix-blend-mode: overlay;
+  @keyframes hero-word {
+    from {
+      transform: translate3d(0, 112%, 0);
+    }
+    to {
+      transform: translate3d(0, 0, 0);
+    }
+  }
+
+  /* The neon switching on: wide and cold, then tight and hot. */
+  @keyframes hero-rim {
+    from {
+      text-shadow:
+        calc(var(--rim) * 2.5) calc(var(--rim) * -2.5) var(--rim-blur * 2)
+          color-mix(in oklab, var(--cyan) 60%, transparent),
+        calc(var(--rim) * -2.5) calc(var(--rim) * 2.5) var(--rim-blur * 2)
+          color-mix(in oklab, var(--violet) 70%, transparent);
+    }
+    to {
+      text-shadow:
+        var(--rim) calc(var(--rim) * -1) var(--rim-blur) var(--magenta),
+        calc(var(--rim) * -1) var(--rim) var(--rim-blur) var(--cyan),
+        calc(var(--rim-offset) * -1) var(--rim-offset) var(--rim-blur * 2)
+          color-mix(in oklab, var(--violet) 55%, transparent);
+    }
+  }
+
+  @keyframes hero-rise {
+    from {
+      opacity: 0;
+      transform: translate3d(0, 18px, 0);
+    }
+    to {
+      opacity: 1;
+      transform: translate3d(0, 0, 0);
+    }
+  }
+
+  @keyframes hero-bob {
+    0%,
+    12% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(4px);
+    }
+    88%,
+    100% {
+      transform: translateY(0);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hero::before {
+      animation: none;
+    }
+
+    .hero__word {
+      animation: hero-fade 260ms var(--ease-out) both;
+    }
+
+    .hero__line:nth-child(1) .hero__word,
+    .hero__line:nth-child(2) .hero__word {
+      animation-delay: 0ms;
+    }
+
+    .hero__lede,
+    .hero__cue {
+      animation: hero-fade 260ms var(--ease-out) both;
+    }
+
+    .hero__cue svg {
+      animation: none;
+    }
+  }
+
+  @keyframes hero-fade {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
   }
 </style>
