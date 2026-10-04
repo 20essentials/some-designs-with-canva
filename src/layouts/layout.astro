@@ -1,5 +1,6 @@
 ---
 import '@/styles/global.css';
+import FixedBackground from '@/components/fixed-background.astro';
 import { lengthOfProjects } from '@/utils/data';
 import { baseUrl } from '@/utils/functions';
 
@@ -31,6 +32,7 @@ const description = `A running archive of ${count} experiments made inside Canva
     </script>
   </head>
   <body>
+    <FixedBackground />
     <slot />
   </body>
 </html>

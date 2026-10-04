@@ -9,11 +9,11 @@ const count = lengthOfProjects;
   <div class='hero__stack'>
     <div class='hero__chip' aria-label={`${count} designs with Canva`}>
       <span class='hero__chip-dot'></span>
-      <span class='hero__chip-text'>{count} Designs</span>
+      <span class='hero__chip-text'>Go to Canva.com</span>
     </div>
 
     <h1 class='hero__title'>
-      <span class='hero__line'><span class='hero__word'>With Canva</span></span>
+      <span class='hero__line'><span class='hero__word'>{count} Designs With Canva</span></span>
     </h1>
 
     <p class='hero__lede'>
@@ -41,7 +41,6 @@ const count = lengthOfProjects;
     min-height: 100svh;
     padding: clamp(3rem, 8vh, 6rem) var(--gutter);
     overflow: clip;
-    background: var(--ink);
   }
 
   .hero__bg {
