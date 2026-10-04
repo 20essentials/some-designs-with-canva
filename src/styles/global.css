@@ -5,16 +5,19 @@
   --ink-raised: #170b26;
   --ink-deep: #06030c;
 
-  --magenta: #ff2e88;
-  --violet: #8b5cff;
+  /* Cyan is the brand accent, the same value the hero sets on "Canva".
+     Hard shadows, selection and hot edges all resolve to this ramp instead of
+     carrying their own hue. --cyan-deep is the same hue held down in
+     luminance for small solid fills, where full --cyan reads too hot. */
   --cyan: #45e3ff;
+  --cyan-deep: #17b3d4;
 
   --paper: #f3ecff;
   --paper-dim: #a294c4;
 
   --edge: color-mix(in oklab, var(--paper) 13%, transparent);
   --edge-soft: color-mix(in oklab, var(--paper) 7%, transparent);
-  --edge-hot: color-mix(in oklab, var(--magenta) 62%, transparent);
+  --edge-hot: color-mix(in oklab, var(--cyan) 55%, transparent);
 
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
   --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
@@ -50,7 +53,7 @@
 
   --sb-size: 0.55rem;
   --sb-track-color: var(--ink-deep);
-  --sb-thumb-color: var(--violet);
+  --sb-thumb-color: var(--cyan-deep);
 }
 
 *,
@@ -117,8 +120,8 @@ h3 {
 }
 
 ::selection {
-  background: var(--magenta);
-  color: var(--paper);
+  background: var(--cyan);
+  color: var(--ink);
 }
 
 /* Scrollbar ------------------------------------------------------------ */

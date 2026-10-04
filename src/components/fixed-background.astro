@@ -1,19 +1,17 @@
 
-<div id="fixed-bg-canvas" class="fixed-bg-container"></div>
+<div id="fixed-bg-canvas" class="fixed-bg-container" aria-hidden="true"></div>
 
 <style>
   .fixed-bg-container {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
+    inset: 0;
+    background-color: #000000;
     z-index: -1;
     pointer-events: none;
     overflow: hidden;
   }
 
-  .fixed-bg-container canvas {
+  .fixed-bg-container :global(canvas) {
     display: block;
     width: 100%;
     height: 100%;
@@ -68,14 +66,42 @@
   const RESPONSIVE_DISTANCE_STRENGTH = 0.72;
   const MAX_RESPONSIVE_DISTANCE_SCALE = 2.4;
 
+  // Peak device pixels the canvas may allocate before the pixel ratio is scaled
+  // down. Roughly 1440p worth, so 1080p/retina laptops keep the full ratio and
+  // 4K panels drop to 1x instead of paying 1.5x on every bloom pass.
+  const MAX_CANVAS_PIXELS = 4_200_000;
+
+  // While the viewport is actively changing we render at a lower pixel ratio:
+  // resizing reallocates every bloom render target, so cheaper targets during a
+  // drag is the difference between smooth and janky.
+  const RESIZE_SETTLE_MS = 180;
+  const RESIZE_QUALITY_SCALE = 0.7;
+
+  // Particles are sized in device pixels, so a constant size looks tiny on a
+  // large display. Scale them with the viewport height to keep the look.
+  const REFERENCE_VIEWPORT_HEIGHT = 1080;
+  const POINT_SCALE_RANGE = { min: 0.8, max: 1.6 };
+
+  // Sustained slow frames drop the pixel ratio one step at a time.
+  const AUTO_QUALITY = {
+    sampleFrames: 120,
+    slowFrameMs: 26,
+    minScale: 0.75,
+    step: 0.85
+  };
+
   const container = document.getElementById('fixed-bg-canvas');
+
+  if (!(container instanceof HTMLElement)) {
+    throw new Error('[fixed-background] container #fixed-bg-canvas not found');
+  }
 
   const scene = new THREE.Scene();
   scene.background = new THREE.Color(params.background);
 
   const camera = new THREE.PerspectiveCamera(
     params.cameraFov,
-    window.innerWidth / window.innerHeight,
+    1,
     0.1,
     150
   );
@@ -85,7 +111,7 @@
   const renderer = new THREE.WebGLRenderer({
     antialias: false,
     powerPreference: 'high-performance',
-    alpha: true
+    alpha: false
   });
 
   renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -106,6 +132,11 @@
   );
 
   composer.addPass(bloomPass);
+
+  const viewport = { width: 0, height: 0, pixelRatio: 0 };
+  let qualityScale = 1;
+  let isResizing = false;
+  let settleTimer = 0;
 
   const sharedFlowGLSL = `
     const float TAU = 6.28318530718;
@@ -624,7 +655,23 @@
     return params.cameraZ * Math.min(distanceScale, MAX_RESPONSIVE_DISTANCE_SCALE);
   }
 
-  function updateCamera(width = window.innerWidth, height = window.innerHeight) {
+  function getPixelRatio(width, height) {
+    const cappedRatio = Math.min(params.dpr, 2);
+    const budgetRatio = Math.sqrt(MAX_CANVAS_PIXELS / (width * height));
+
+    return Math.max(1, Math.min(cappedRatio, budgetRatio));
+  }
+
+  function getPointScale(height) {
+    const ratio = height / REFERENCE_VIEWPORT_HEIGHT;
+
+    return Math.min(
+      POINT_SCALE_RANGE.max,
+      Math.max(POINT_SCALE_RANGE.min, ratio)
+    );
+  }
+
+  function updateCamera(width = viewport.width, height = viewport.height) {
     const safeWidth = Math.max(width, 1);
     const safeHeight = Math.max(height, 1);
 
@@ -643,22 +690,86 @@
     camera.updateProjectionMatrix();
   }
 
-  function resizeRenderer() {
-    const width = Math.max(document.documentElement.clientWidth, window.innerWidth, 1);
-    const height = Math.max(document.documentElement.clientHeight, window.innerHeight, 1);
+  function updatePointSize(height, pixelRatio) {
+    const pointSize = params.particleSize * pixelRatio * getPointScale(height);
 
-    const pixelRatio = Math.min(Number(params.dpr), 2);
+    if (particleMaterial) {
+      particleMaterial.uniforms.uPointSize.value = pointSize;
+    }
 
-    renderer.setPixelRatio(pixelRatio);
-    renderer.setSize(width, height, false);
+    if (starMaterial) {
+      starMaterial.uniforms.uPointSize.value = pointSize;
+    }
+  }
 
-    composer.setPixelRatio(pixelRatio);
+  function applyViewportSize() {
+    const { width, height } = viewport;
+
+    if (width < 1 || height < 1) {
+      return;
+    }
+
+    const pixelRatio =
+      getPixelRatio(width, height) *
+      qualityScale *
+      (isResizing ? RESIZE_QUALITY_SCALE : 1);
+
+    // updateStyle writes the CSS size too, so the buffer is scaled to the
+    // measured box instead of overflowing it.
+    renderer.setSize(width, height);
+
+    if (pixelRatio !== viewport.pixelRatio) {
+      renderer.setPixelRatio(pixelRatio);
+      composer.setPixelRatio(pixelRatio);
+      viewport.pixelRatio = pixelRatio;
+    }
+
     composer.setSize(width, height);
 
-    bloomPass.setSize(width * pixelRatio, height * pixelRatio);
-
     updateCamera(width, height);
-    updateFlowUniforms();
+    updatePointSize(height, pixelRatio);
+  }
+
+  function measureContainer() {
+    const rect = container.getBoundingClientRect();
+
+    // Rounding keeps sub-pixel box changes from reallocating targets forever.
+    return {
+      width: Math.max(Math.round(rect.width), 1),
+      height: Math.max(Math.round(rect.height), 1)
+    };
+  }
+
+  function handleViewportChange() {
+    const next = measureContainer();
+
+    if (next.width === viewport.width && next.height === viewport.height) {
+      return;
+    }
+
+    viewport.width = next.width;
+    viewport.height = next.height;
+
+    beginResizeActivity();
+    applyViewportSize();
+  }
+
+  function beginResizeActivity() {
+    clearTimeout(settleTimer);
+
+    isResizing = true;
+    settleTimer = setTimeout(endResizeActivity, RESIZE_SETTLE_MS);
+  }
+
+  function endResizeActivity() {
+    clearTimeout(settleTimer);
+
+    if (!isResizing) {
+      return;
+    }
+
+    isResizing = false;
+    applyViewportSize();
   }
 
   function createParticleUniforms() {
@@ -870,11 +981,8 @@
   }
 
   function updateFlowUniforms() {
-    const pixelRatio = Math.min(Number(params.dpr), 2);
-
     if (particleMaterial) {
       const uniforms = particleMaterial.uniforms;
-      uniforms.uPointSize.value = params.particleSize * pixelRatio;
       uniforms.uFlowSpeed.value = params.flowSpeed;
       uniforms.uTwist.value = params.twist;
       uniforms.uNeckRadius.value = params.neckRadius;
@@ -888,7 +996,6 @@
 
     if (starMaterial) {
       const uniforms = starMaterial.uniforms;
-      uniforms.uPointSize.value = params.particleSize * pixelRatio;
       uniforms.uColor.value.set(params.particleColor);
       uniforms.uOpacity.value = params.starOpacity;
     }
@@ -917,21 +1024,35 @@
   rebuildParticles();
   rebuildLines();
   updatePostProcessing();
-  resizeRenderer();
+  updateFlowUniforms();
 
-  const clock = new THREE.Clock();
-  let elapsed = 0;
-  let resizeFrame = 0;
-
-  function handleResize() {
-    cancelAnimationFrame(resizeFrame);
-    resizeFrame = requestAnimationFrame(resizeRenderer);
+  if (flowLines) {
+    flowLines.visible = params.lineOpacity > 0.002;
   }
 
-  function animate() {
-    requestAnimationFrame(animate);
+  renderer.domElement.setAttribute('aria-hidden', 'true');
 
-    const delta = Math.min(clock.getDelta(), 0.05);
+  const timer = new THREE.Timer();
+  const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+  let elapsed = 0;
+  let frameHandle = 0;
+  let isRunning = null;
+  let isContextLost = false;
+  let isPageHidden = document.hidden;
+
+  let sampledFrames = 0;
+  let slowFrames = 0;
+
+  const resizeObserver = new ResizeObserver(handleViewportChange);
+  resizeObserver.observe(container);
+
+  const initialViewport = measureContainer();
+  viewport.width = initialViewport.width;
+  viewport.height = initialViewport.height;
+  applyViewportSize();
+
+  function renderScene(delta) {
     elapsed += delta;
 
     if (particleMaterial) {
@@ -950,11 +1071,96 @@
     composer.render();
   }
 
-  window.addEventListener('resize', handleResize, { passive: true });
+  function sampleFrameTime(rawDelta) {
+    if (isResizing) {
+      return;
+    }
 
-  if (window.visualViewport) {
-    window.visualViewport.addEventListener('resize', handleResize, { passive: true });
+    const frameMs = rawDelta * 1000;
+
+    // Ignore vsync-locked frames and outliers (GC, tab wake, alt-tab).
+    if (frameMs <= 6 || frameMs >= 100) {
+      return;
+    }
+
+    sampledFrames++;
+
+    if (frameMs > AUTO_QUALITY.slowFrameMs) {
+      slowFrames++;
+    }
+
+    if (sampledFrames < AUTO_QUALITY.sampleFrames) {
+      return;
+    }
+
+    const shouldDownscale =
+      slowFrames / sampledFrames > 0.6 &&
+      qualityScale > AUTO_QUALITY.minScale;
+
+    sampledFrames = 0;
+    slowFrames = 0;
+
+    if (shouldDownscale) {
+      qualityScale = Math.max(
+        AUTO_QUALITY.minScale,
+        qualityScale * AUTO_QUALITY.step
+      );
+      applyViewportSize();
+    }
   }
 
-  animate();
+  function animate(timestamp) {
+    frameHandle = requestAnimationFrame(animate);
+
+    timer.update(timestamp);
+
+    const rawDelta = timer.getDelta();
+    const delta = Math.min(rawDelta, 0.05);
+
+    renderScene(delta);
+    sampleFrameTime(rawDelta);
+  }
+
+  function syncAnimation() {
+    const shouldRun = !isPageHidden && !isContextLost && !motionQuery.matches;
+
+    if (shouldRun === isRunning) {
+      return;
+    }
+
+    isRunning = shouldRun;
+
+    if (shouldRun) {
+      timer.reset();
+      frameHandle = requestAnimationFrame(animate);
+    } else {
+      cancelAnimationFrame(frameHandle);
+      frameHandle = 0;
+
+      // Keep a still frame on screen when we stop for a non-hidden reason.
+      if (!isPageHidden && !isContextLost) {
+        renderScene(0);
+      }
+    }
+  }
+
+  document.addEventListener('visibilitychange', () => {
+    isPageHidden = document.hidden;
+    syncAnimation();
+  });
+
+  motionQuery.addEventListener('change', syncAnimation);
+
+  renderer.domElement.addEventListener('webglcontextlost', () => {
+    isContextLost = true;
+    syncAnimation();
+  });
+
+  renderer.domElement.addEventListener('webglcontextrestored', () => {
+    isContextLost = false;
+    applyViewportSize();
+    syncAnimation();
+  });
+
+  syncAnimation();
 </script>
