@@ -24,7 +24,6 @@
 
   --gutter: clamp(1.25rem, 5vw, 4.5rem);
   --gap: clamp(0.7rem, 1.3vw, 1.15rem);
-  --bar-height: 4.5rem;
 
   /* Type families. The faces behind these variables are self-hosted and
      injected by Astro's Fonts API; the stacks below add the last-resort

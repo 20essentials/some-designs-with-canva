@@ -907,7 +907,7 @@ export const arrayCards = [
     localImage: '/assets/slider-animation.avif',
     id: '135'
   },
-];
+].toSorted(() => Math.random() - 0.5);
 
 
 

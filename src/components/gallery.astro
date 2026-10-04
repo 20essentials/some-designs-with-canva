@@ -8,7 +8,7 @@ const last = projects[projects.length - 1].id;
 ---
 
 <section class='archive' id='archive' aria-labelledby='archive-heading'>
-  <div class='archive__bar'>
+  <div class='archive__bar' data-bar>
     <div class='archive__ident'>
       <h2 class='archive__label' id='archive-heading'>Archive</h2>
       <span class='archive__range' aria-hidden='true'>
@@ -16,25 +16,35 @@ const last = projects[projects.length - 1].id;
       </span>
     </div>
 
-    <div class='archive__filters' role='group' aria-label='Filter designs by kind'>
-      {
-        categories.map(({ id, label, count }) => (
-          <button
-            type='button'
-            class='archive__filter'
-            data-filter={id}
-            aria-pressed={id === 'all' ? 'true' : 'false'}
-          >
-            <span class='archive__filter-label'>{label}</span>
-            <span class='archive__filter-count' aria-hidden='true'>{count}</span>
-          </button>
-        ))
-      }
+    <div class='archive__tabs' data-tabs>
+      <span class='archive__thumb' data-thumb aria-hidden='true'></span>
+      <div
+        class='archive__filters'
+        data-filters
+        role='group'
+        aria-label='Filter designs by kind'
+      >
+        {
+          categories.map(({ id, label, count }) => (
+            <button
+              type='button'
+              class='archive__filter'
+              data-filter={id}
+              aria-pressed={id === 'all' ? 'true' : 'false'}
+            >
+              <span class='archive__filter-label'>{label}</span>
+              <span class='archive__filter-count' aria-hidden='true'>{count}</span>
+            </button>
+          ))
+        }
+      </div>
     </div>
 
-    <p class='archive__status' role='status'>
+    <p class='archive__status' role='status' data-status data-swap='false'>
       {total} of {total} designs
     </p>
+
+    <span class='archive__progress' data-progress aria-hidden='true'></span>
   </div>
 
   <ul class='archive__grid' data-grid>
@@ -94,94 +104,241 @@ const last = projects[projects.length - 1].id;
 
   /* Bar ---------------------------------------------------------------- */
 
+  /* Full-bleed glass: the negative margins undo the section gutter so the
+     blur reaches both edges, and the padding keeps the controls on the same
+     measure as the wall below. */
   .archive__bar {
+    --well-pad: 3px;
+
     position: sticky;
     top: 0;
     z-index: 20;
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      'ident status'
+      'tabs tabs';
     align-items: center;
-    gap: 0.75rem clamp(1rem, 3vw, 2.5rem);
-    min-height: var(--bar-height);
-    padding-block: 0.7rem;
-    margin-bottom: clamp(1.75rem, 4vw, 3rem);
-    background: color-mix(in oklab, var(--ink) 82%, transparent);
-    backdrop-filter: blur(14px) saturate(1.3);
-    border-bottom: 1px solid var(--edge-soft);
+    gap: var(--space-xs) var(--space-m);
+    padding: clamp(0.55rem, 1.6vh, 0.85rem) var(--gutter);
+    margin-inline: calc(var(--gutter) * -1);
+    margin-bottom: clamp(1.5rem, 3.5vw, 2.75rem);
+    background: linear-gradient(
+      to bottom,
+      color-mix(in oklab, var(--ink-deep) 88%, transparent) 0%,
+      color-mix(in oklab, var(--ink-deep) 58%, transparent) 100%
+    );
+    backdrop-filter: blur(26px) saturate(1.8);
+    -webkit-backdrop-filter: blur(26px) saturate(1.8);
+    box-shadow:
+      inset 0 1px 0 color-mix(in oklab, var(--paper) 8%, transparent),
+      inset 0 -1px 0 color-mix(in oklab, var(--ink-deep) 65%, transparent),
+      0 24px 48px -34px color-mix(in oklab, var(--ink-deep) 95%, transparent);
+    transition: box-shadow 400ms var(--ease-out);
+  }
+
+  /* Depth only reads once the bar is actually holding the viewport. */
+  .archive__bar[data-stuck='true'] {
+    box-shadow:
+      inset 0 1px 0 color-mix(in oklab, var(--paper) 13%, transparent),
+      inset 0 -1px 0 color-mix(in oklab, var(--ink-deep) 80%, transparent),
+      0 28px 60px -30px color-mix(in oklab, var(--ink-deep) 95%, transparent);
   }
 
   .archive__ident {
+    grid-area: ident;
     display: flex;
     align-items: baseline;
-    gap: 0.7rem;
-    flex-shrink: 0;
+    gap: 0.65rem;
+    min-width: 0;
   }
 
+  /* The bar is UI chrome, so the label is UI type: the display serif reads
+     like a headline at this size and fights the micro-labels beside it. */
   .archive__label {
-    font-family: var(--font-display);
-    font-size: clamp(1.05rem, 1.4vw, 1.35rem);
-    letter-spacing: 0.01em;
+    font-family: var(--font-ui);
+    font-size: 0.9375rem;
+    font-weight: 500;
+    letter-spacing: -0.005em;
     color: var(--paper);
+    white-space: nowrap;
   }
 
-  .archive__range,
+  .archive__range {
+    padding-left: 0.65rem;
+    font-family: var(--font-mono);
+    font-size: var(--text-meta);
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: color-mix(in oklab, var(--paper-dim) 88%, transparent);
+    border-left: 1px solid var(--edge);
+    white-space: nowrap;
+  }
+
   .archive__status {
-    font-size: 0.78rem;
+    grid-area: status;
+    justify-self: end;
+    font-family: var(--font-mono);
+    font-size: var(--text-meta);
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
     font-variant-numeric: tabular-nums;
-    letter-spacing: 0.08em;
-    color: var(--paper-dim);
+    color: color-mix(in oklab, var(--paper) 72%, transparent);
+    white-space: nowrap;
+    transition:
+      opacity 200ms var(--ease-out),
+      transform 200ms var(--ease-out);
   }
 
-  .archive__status {
-    margin-left: auto;
-    flex-shrink: 0;
+  .archive__status[data-swap='true'] {
+    opacity: 0;
+    transform: translate3d(0, -4px, 0);
+  }
+
+  /* Tab rail ------------------------------------------------------------ */
+
+  .archive__tabs {
+    grid-area: tabs;
+    position: relative;
+    min-width: 0;
+    max-width: 100%;
+    padding: var(--well-pad);
+    border-radius: 999px;
+    background: color-mix(in oklab, var(--ink-raised) 68%, transparent);
+    box-shadow:
+      inset 0 0 0 1px color-mix(in oklab, var(--paper) 9%, transparent),
+      inset 0 1px 3px color-mix(in oklab, var(--ink-deep) 60%, transparent);
   }
 
   .archive__filters {
     display: flex;
-    flex-wrap: wrap;
-    gap: 0.4rem;
+    gap: 2px;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
   }
 
+  .archive__filters::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* The follower. Position is written from script each frame while it
+     settles; the transition here only covers its own fade-in. */
+  .archive__thumb {
+    position: absolute;
+    top: var(--well-pad);
+    left: 0;
+    height: calc(100% - var(--well-pad) * 2);
+    width: 0;
+    border-radius: 999px;
+    background: linear-gradient(180deg, #fff 0%, var(--paper) 100%);
+    box-shadow:
+      0 1px 2px color-mix(in oklab, var(--ink-deep) 45%, transparent),
+      0 10px 20px -12px color-mix(in oklab, var(--ink-deep) 90%, transparent);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transform: translate3d(0, 0, 0);
+    transition: opacity 300ms var(--ease-out);
+    will-change: transform, width;
+  }
+
+  .archive__tabs[data-ready] .archive__thumb {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  /* Idle tabs sit on ink-raised: --paper-dim carries the label, and the count
+     needs a touch more than the dim tone to clear 4.5:1 at 0.66rem. */
   .archive__filter {
+    position: relative;
+    z-index: 1;
     display: inline-flex;
+    flex: 0 0 auto;
     align-items: baseline;
     gap: 0.45em;
-    padding: 0.34em 0.7em;
-    font-size: 0.82rem;
-    line-height: 1.2;
-    color: var(--paper-dim);
-    border: 1px solid var(--edge-soft);
-    border-radius: 2px;
+    padding: 0.42em 0.9em;
+    font-size: 0.8rem;
+    line-height: 1.25;
+    white-space: nowrap;
+    color: color-mix(in oklab, var(--paper) 82%, transparent);
+    border-radius: 999px;
     transition:
-      color 160ms var(--ease-out),
-      border-color 160ms var(--ease-out),
-      background-color 160ms var(--ease-out);
+      color 200ms var(--ease-out),
+      background-color 200ms var(--ease-out);
   }
 
   .archive__filter-count {
-    font-size: 0.72em;
+    font-family: var(--font-mono);
+    font-size: 0.66rem;
+    font-weight: 500;
     font-variant-numeric: tabular-nums;
-    color: color-mix(in oklab, var(--paper-dim) 65%, transparent);
-    transition: color 160ms var(--ease-out);
+    color: color-mix(in oklab, var(--paper) 62%, transparent);
+    transition: color 200ms var(--ease-out);
+  }
+
+  .archive__filter[aria-pressed='true'] {
+    font-weight: 500;
+    color: var(--ink);
+  }
+
+  .archive__filter[aria-pressed='true'] .archive__filter-count {
+    color: color-mix(in oklab, var(--ink) 74%, transparent);
   }
 
   @media (hover: hover) and (pointer: fine) {
     .archive__filter:hover {
       color: var(--paper);
-      border-color: var(--edge);
-      background: var(--edge-soft);
+      background: color-mix(in oklab, var(--paper) 9%, transparent);
+    }
+
+    .archive__filter[aria-pressed='true']:hover {
+      color: var(--ink);
+      background: none;
     }
   }
 
-  .archive__filter[aria-pressed='true'] {
-    color: var(--ink);
-    background: var(--paper);
-    border-color: var(--paper);
+  /* Hairline reading position, so a held bar still tells you where you are. */
+  .archive__progress {
+    position: absolute;
+    inset: auto 0 0 0;
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      color-mix(in oklab, var(--cyan) 65%, transparent) 24%,
+      var(--cyan) 50%,
+      color-mix(in oklab, var(--cyan) 65%, transparent) 76%,
+      transparent 100%
+    );
+    transform: scaleX(var(--progress, 0));
+    transform-origin: 0 50%;
+    opacity: 0.7;
+    pointer-events: none;
   }
 
-  .archive__filter[aria-pressed='true'] .archive__filter-count {
-    color: color-mix(in oklab, var(--ink) 60%, transparent);
+  @media (min-width: 52em) {
+    .archive__bar {
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      grid-template-areas: 'ident tabs status';
+    }
+
+    .archive__tabs {
+      justify-self: center;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .archive__bar,
+    .archive__thumb,
+    .archive__status,
+    .archive__filter,
+    .archive__filter-count {
+      transition-duration: 1ms;
+    }
   }
 
   /* Wall --------------------------------------------------------------- */
@@ -432,6 +589,8 @@ const last = projects[projects.length - 1].id;
   const clamp = (value: number, min: number, max: number) =>
     value < min ? min : value > max ? max : value;
 
+  const calm = matchMedia('(prefers-reduced-motion: reduce)');
+
   const grid = document.querySelector<HTMLElement>('[data-grid]');
   const tiles = grid
     ? [...grid.querySelectorAll<HTMLElement>('[data-tile]')]
@@ -486,7 +645,6 @@ const last = projects[projects.length - 1].id;
   tiles.forEach((tile) => viewport.observe(tile));
 
   const canPoint = matchMedia('(hover: hover) and (pointer: fine)');
-  const calm = matchMedia('(prefers-reduced-motion: reduce)');
   let pending = 0;
 
   const onMove = (event: PointerEvent) => {
@@ -515,6 +673,160 @@ const last = projects[projects.length - 1].id;
     document.addEventListener('pointerleave', onReset);
   }
 
+  /* Tab follower -------------------------------------------------------- */
+
+  const bar = document.querySelector<HTMLElement>('[data-bar]');
+  const tabs = document.querySelector<HTMLElement>('[data-tabs]');
+  const thumb = document.querySelector<HTMLElement>('[data-thumb]');
+  const filters = document.querySelector<HTMLElement>('[data-filters]');
+  const progress = document.querySelector<HTMLElement>('[data-progress]');
+
+  /* The pill is a spring rather than a transition: its target moves on
+     click, on resize, on font swap and while the strip scrolls, and a
+     transition would have to be retriggered for each of those. */
+  let follow = (_immediate?: boolean) => {};
+
+  if (bar && tabs && thumb && filters && buttons.length) {
+    let targetX = 0;
+    let targetW = 0;
+    let x = 0;
+    let w = 0;
+    let vx = 0;
+    let vw = 0;
+    let frame = 0;
+    let last = 0;
+
+    /* Critical damping is 2*sqrt(260) ≈ 32; 26 leaves a hair of overshoot
+       so a long jump across the rail arrives with some weight. */
+    const STIFF = 260;
+    const DAMP = 26;
+
+    const pressed = () =>
+      buttons.find((button) => button.getAttribute('aria-pressed') === 'true') ??
+      buttons[0];
+
+    const draw = () => {
+      thumb.style.width = `${w.toFixed(2)}px`;
+      thumb.style.transform = `translate3d(${x.toFixed(2)}px, 0, 0)`;
+    };
+
+    const measure = () => {
+      const button = pressed();
+      const rail = tabs.getBoundingClientRect();
+      const rect = button.getBoundingClientRect();
+
+      targetX = rect.left - rail.left - tabs.clientLeft;
+      targetW = rect.width;
+
+      /* Pull the pressed tab into the strip when the rail overflows. */
+      const edge = rect.left - filters.getBoundingClientRect().left;
+      const to = clamp(
+        edge - 10,
+        0,
+        Math.max(0, filters.scrollWidth - filters.clientWidth)
+      );
+      if (Math.abs(filters.scrollLeft - to) > 2) {
+        filters.scrollTo({ left: to, behavior: calm.matches ? 'auto' : 'smooth' });
+      }
+    };
+
+    const step = (now: number) => {
+      frame = 0;
+      const dt = Math.min(0.034, (now - last) / 1000 || 0.016);
+      last = now;
+
+      vx += (-STIFF * (x - targetX) - DAMP * vx) * dt;
+      vw += (-STIFF * (w - targetW) - DAMP * vw) * dt;
+      x += vx * dt;
+      w += vw * dt;
+
+      const done =
+        Math.abs(x - targetX) < 0.05 &&
+        Math.abs(w - targetW) < 0.05 &&
+        Math.abs(vx) < 0.5 &&
+        Math.abs(vw) < 0.5;
+
+      if (done) {
+        x = targetX;
+        w = targetW;
+        vx = 0;
+        vw = 0;
+      }
+
+      draw();
+      if (!done) frame = requestAnimationFrame(step);
+    };
+
+    follow = (immediate = false) => {
+      measure();
+
+      if (immediate || calm.matches) {
+        x = targetX;
+        w = targetW;
+        vx = 0;
+        vw = 0;
+        if (frame) cancelAnimationFrame(frame);
+        frame = 0;
+        draw();
+        return;
+      }
+
+      if (!frame) {
+        last = performance.now();
+        frame = requestAnimationFrame(step);
+      }
+    };
+
+    /* First paint lands the pill on the pressed tab without a slide. */
+    follow(true);
+    tabs.dataset.ready = '';
+
+    if ('ResizeObserver' in window) {
+      const watcher = new ResizeObserver(() => follow());
+      watcher.observe(filters);
+      watcher.observe(tabs);
+    } else {
+      addEventListener('resize', () => follow());
+    }
+
+    document.fonts.ready.then(() => follow(true));
+    filters.addEventListener('scroll', () => follow(), { passive: true });
+  }
+
+  /* Reading position, written once per scroll frame. */
+  const section = document.querySelector<HTMLElement>('#archive');
+
+  if (bar && progress && section) {
+    let queued = 0;
+    let stuck: boolean | null = null;
+
+    const paint = () => {
+      queued = 0;
+      const rect = section.getBoundingClientRect();
+      const span = Math.max(1, rect.height - bar.offsetHeight);
+      progress.style.setProperty(
+        '--progress',
+        clamp(-rect.top / span, 0, 1).toFixed(4)
+      );
+
+      const held = rect.top < 0;
+      if (held !== stuck) {
+        stuck = held;
+        bar.dataset.stuck = String(held);
+      }
+    };
+
+    addEventListener(
+      'scroll',
+      () => {
+        if (!queued) queued = requestAnimationFrame(paint);
+      },
+      { passive: true }
+    );
+
+    paint();
+  }
+
   /* Filters ------------------------------------------------------------ */
 
   const apply = (filter: string) => {
@@ -534,7 +846,18 @@ const last = projects[projects.length - 1].id;
       returning.forEach((tile) => tile.classList.add('is-in'))
     );
 
-    if (status) status.textContent = `${shown} of ${total} designs`;
+    if (status) {
+      const write = () => {
+        status.textContent = `${shown} of ${total} designs`;
+        status.dataset.swap = 'false';
+      };
+
+      if (calm.matches) write();
+      else {
+        status.dataset.swap = 'true';
+        setTimeout(write, 140);
+      }
+    }
   };
 
   for (const button of buttons) {
@@ -544,6 +867,7 @@ const last = projects[projects.length - 1].id;
         other.setAttribute('aria-pressed', String(other === button))
       );
       apply(button.dataset.filter!);
+      follow();
     });
   }
 
