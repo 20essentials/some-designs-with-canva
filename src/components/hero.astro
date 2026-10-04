@@ -5,9 +5,14 @@ const count = lengthOfProjects;
 ---
 
 <section class='hero'>
+  <div class='hero__bg' aria-hidden='true'></div>
   <div class='hero__stack'>
+    <div class='hero__chip' aria-label={`${count} designs with Canva`}>
+      <span class='hero__chip-dot'></span>
+      <span class='hero__chip-text'>{count} Designs</span>
+    </div>
+
     <h1 class='hero__title'>
-      <span class='hero__line'><span class='hero__word'>{count} Designs</span></span>
       <span class='hero__line'><span class='hero__word'>With Canva</span></span>
     </h1>
 
@@ -29,7 +34,6 @@ const count = lengthOfProjects;
   .hero {
     --rim: clamp(0.5px, 0.14vw, 1.5px);
     --rim-blur: clamp(1px, 0.3vw, 3px);
-    --rim-offset: clamp(2px, 0.55vw, 6px);
 
     position: relative;
     display: grid;
@@ -37,33 +41,68 @@ const count = lengthOfProjects;
     min-height: 100svh;
     padding: clamp(3rem, 8vh, 6rem) var(--gutter);
     overflow: clip;
-    background:
-      radial-gradient(
-        120% 70% at 50% -10%,
-        color-mix(in oklab, var(--violet) 22%, transparent) 0%,
-        transparent 62%
-      ),
-      radial-gradient(
-        90% 55% at 50% 112%,
-        color-mix(in oklab, var(--magenta) 16%, transparent) 0%,
-        transparent 60%
-      ),
-      var(--ink);
+    background: var(--ink);
   }
 
-  /* One orchestrated page-load moment: a light leak crosses the field,
-     the type lands, the rim-light tightens from cold to hot. */
+  .hero__bg {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+  }
+
+  .hero__bg::before,
+  .hero__bg::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+  }
+
+  /* Soft radial mesh: more refined, less saturated */
+  .hero__bg::before {
+    background:
+      radial-gradient(
+        120% 80% at 50% -20%,
+        color-mix(in oklab, var(--violet) 16%, transparent) 0%,
+        transparent 70%
+      ),
+      radial-gradient(
+        90% 60% at 50% 120%,
+        color-mix(in oklab, var(--magenta) 10%, transparent) 0%,
+        transparent 68%
+      ),
+      radial-gradient(
+        60% 40% at 20% 10%,
+        color-mix(in oklab, var(--cyan) 8%, transparent) 0%,
+        transparent 80%
+      ),
+      radial-gradient(
+        60% 40% at 80% 5%,
+        color-mix(in oklab, var(--violet) 8%, transparent) 0%,
+        transparent 80%
+      );
+  }
+
+  /* Subtly textured noise to add depth without grit */
+  .hero__bg::after {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140' viewBox='0 0 140 140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='1' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    opacity: 0.08;
+    mix-blend-mode: soft-light;
+    transform: scale(1.05);
+  }
+
+  /* One orchestrated page-load moment: very subtle light leak */
   .hero::before {
     content: '';
     position: absolute;
-    inset: -30% -60%;
+    inset: -25% -40%;
     background: radial-gradient(
-      38% 30% at 50% 50%,
-      color-mix(in oklab, var(--cyan) 34%, transparent) 0%,
-      transparent 70%
+      36% 28% at 50% 50%,
+      color-mix(in oklab, var(--cyan) 20%, transparent) 0%,
+      transparent 72%
     );
     opacity: 0;
-    transform: translate3d(-42%, 0, 0) scale(0.7);
+    transform: translate3d(-36%, 0, 0) scale(0.8);
     animation: hero-leak 1500ms var(--ease-out) 80ms both;
     pointer-events: none;
   }
@@ -72,16 +111,60 @@ const count = lengthOfProjects;
     position: relative;
     display: grid;
     justify-items: center;
-    gap: clamp(1.5rem, 3.5vh, 2.5rem);
+    gap: clamp(1.25rem, 2.8vh, 2.25rem);
     max-width: 46ch;
     text-align: center;
+  }
+
+  /* Pill / chip with the count */
+  .hero__chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45em;
+    padding: 0.38em 0.72em;
+    font-size: 0.78rem;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--paper);
+    border: 1px solid var(--edge);
+    border-radius: 999px;
+    background: color-mix(in oklab, var(--ink-raised) 64%, transparent);
+    backdrop-filter: blur(8px) saturate(1.1);
+    box-shadow:
+      inset 0 1px 0 color-mix(in oklab, white 10%, transparent),
+      0 1px 1px color-mix(in oklab, var(--ink-deep) 40%, transparent);
+    animation: hero-rise 680ms var(--ease-out) 120ms both;
+    transition:
+      border-color 160ms var(--ease-out),
+      background-color 160ms var(--ease-out),
+      transform 160ms var(--ease-out),
+      box-shadow 160ms var(--ease-out);
+  }
+
+  .hero__chip-dot {
+    width: 0.45em;
+    height: 0.45em;
+    border-radius: 50%;
+    background: radial-gradient(
+        circle at 40% 40%,
+        var(--paper) 0%,
+        color-mix(in oklab, var(--cyan) 60%, transparent) 60%
+      )
+      color-mix(in oklab, var(--cyan) 40%, transparent);
+    box-shadow: 0 0 0 2px color-mix(in oklab, var(--cyan) 28%, transparent);
+  }
+
+  .hero__chip-text {
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.08em;
   }
 
   .hero__title {
     font-family: var(--font-display);
     font-size: clamp(2.75rem, 11.5vw, 8.5rem);
-    line-height: 0.94;
-    letter-spacing: 0.005em;
+    line-height: 0.96;
+    letter-spacing: -0.01em;
     color: var(--paper);
     margin: 0;
   }
@@ -89,62 +172,77 @@ const count = lengthOfProjects;
   .hero__line {
     display: block;
     overflow: hidden;
-    padding-block: 0.04em;
+    padding-block: 0.02em;
   }
 
   .hero__word {
     display: block;
     animation:
       hero-word 900ms var(--ease-out) both,
-      hero-rim 1100ms var(--ease-out) both;
+      hero-rim-soft 1100ms var(--ease-out) both;
   }
 
-  .hero__line:nth-child(1) .hero__word {
-    animation-delay: 140ms, 140ms;
-  }
-
-  .hero__line:nth-child(2) .hero__word {
-    animation-delay: 230ms, 230ms;
+  .hero__line .hero__word {
+    animation-delay: 220ms, 220ms;
   }
 
   .hero__lede {
     max-width: 42ch;
     font-size: clamp(0.98rem, 0.55vw + 0.85rem, 1.15rem);
+    line-height: 1.6;
     color: var(--paper-dim);
     text-wrap: balance;
-    animation: hero-rise 700ms var(--ease-out) 520ms both;
+    animation: hero-rise 700ms var(--ease-out) 560ms both;
   }
 
   .hero__cue {
     display: inline-flex;
     align-items: center;
-    gap: 0.6em;
-    padding: 0.55em 1.05em;
+    gap: 0.55em;
+    padding: 0.55em 1.08em;
     font-size: 0.875rem;
     font-weight: 500;
     letter-spacing: 0.02em;
     color: var(--paper);
     border: 1px solid var(--edge);
-    border-radius: 2px;
-    background: color-mix(in oklab, var(--ink-raised) 55%, transparent);
-    animation: hero-rise 700ms var(--ease-out) 720ms both;
+    border-radius: 999px;
+    background: color-mix(in oklab, var(--ink-raised) 58%, transparent);
+    backdrop-filter: blur(8px) saturate(1.08);
+    transform-origin: 50% 50%;
+    animation: hero-rise 700ms var(--ease-out) 760ms both;
     transition:
-      border-color 200ms var(--ease-out),
-      color 200ms var(--ease-out),
-      transform 200ms var(--ease-out);
+      border-color 160ms var(--ease-out),
+      color 160ms var(--ease-out),
+      background-color 160ms var(--ease-out),
+      transform 160ms var(--ease-out),
+      box-shadow 160ms var(--ease-out);
   }
 
   .hero__cue svg {
     width: 0.72em;
     height: auto;
-    animation: hero-bob 2200ms linear 1400ms infinite;
+    animation: hero-bob 2200ms linear 1500ms infinite;
+    will-change: transform;
   }
 
   @media (hover: hover) and (pointer: fine) {
+    .hero__chip:hover {
+      border-color: var(--edge-hot);
+      background: color-mix(in oklab, var(--ink-raised) 72%, transparent);
+      transform: translateY(-1px);
+    }
+
     .hero__cue:hover {
       border-color: var(--edge-hot);
       color: var(--cyan);
-      transform: translateY(-2px);
+      background: color-mix(in oklab, var(--ink-raised) 70%, transparent);
+      transform: translateY(-1px);
+      box-shadow: 0 1px 0 color-mix(in oklab, var(--cyan) 16%, transparent) inset,
+        0 10px 40px -20px color-mix(in oklab, var(--cyan) 40%, transparent);
+    }
+
+    .hero__cue:active {
+      transform: scale(0.96);
     }
 
     .hero__cue:hover svg {
@@ -153,17 +251,21 @@ const count = lengthOfProjects;
     }
   }
 
+  .hero__cue:focus-visible {
+    border-radius: 999px;
+  }
+
   @keyframes hero-leak {
     from {
       opacity: 0;
-      transform: translate3d(-42%, 0, 0) scale(0.7);
+      transform: translate3d(-36%, 0, 0) scale(0.8);
     }
-    35% {
-      opacity: 1;
+    40% {
+      opacity: 0.5;
     }
     to {
       opacity: 0;
-      transform: translate3d(42%, 0, 0) scale(1.25);
+      transform: translate3d(36%, 0, 0) scale(1.15);
     }
   }
 
@@ -176,28 +278,25 @@ const count = lengthOfProjects;
     }
   }
 
-  /* The neon switching on: wide and cold, then tight and hot. */
-  @keyframes hero-rim {
+  /* Softer rim-light, more "glow" than harsh neon */
+  @keyframes hero-rim-soft {
     from {
       text-shadow:
-        calc(var(--rim) * 2.5) calc(var(--rim) * -2.5) var(--rim-blur * 2)
-          color-mix(in oklab, var(--cyan) 60%, transparent),
-        calc(var(--rim) * -2.5) calc(var(--rim) * 2.5) var(--rim-blur * 2)
-          color-mix(in oklab, var(--violet) 70%, transparent);
+        0 0 0 color-mix(in oklab, var(--cyan) 0%, transparent),
+        0 0 0 color-mix(in oklab, var(--violet) 0%, transparent);
     }
     to {
       text-shadow:
-        var(--rim) calc(var(--rim) * -1) var(--rim-blur) var(--magenta),
-        calc(var(--rim) * -1) var(--rim) var(--rim-blur) var(--cyan),
-        calc(var(--rim-offset) * -1) var(--rim-offset) var(--rim-blur * 2)
-          color-mix(in oklab, var(--violet) 55%, transparent);
+        0 0.5px 0 color-mix(in oklab, white 12%, transparent) inset,
+        0 -1px 80px color-mix(in oklab, var(--violet) 14%, transparent),
+        0 1px 120px color-mix(in oklab, var(--cyan) 10%, transparent);
     }
   }
 
   @keyframes hero-rise {
     from {
       opacity: 0;
-      transform: translate3d(0, 18px, 0);
+      transform: translate3d(0, 14px, 0);
     }
     to {
       opacity: 1;
@@ -211,7 +310,7 @@ const count = lengthOfProjects;
       transform: translateY(0);
     }
     50% {
-      transform: translateY(4px);
+      transform: translateY(3px);
     }
     88%,
     100% {
@@ -220,19 +319,24 @@ const count = lengthOfProjects;
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .hero::before {
+    .hero::before,
+    .hero__bg::after {
       animation: none;
+    }
+
+    .hero__bg::after {
+      transform: none;
     }
 
     .hero__word {
       animation: hero-fade 260ms var(--ease-out) both;
     }
 
-    .hero__line:nth-child(1) .hero__word,
-    .hero__line:nth-child(2) .hero__word {
+    .hero__line .hero__word {
       animation-delay: 0ms;
     }
 
+    .hero__chip,
     .hero__lede,
     .hero__cue {
       animation: hero-fade 260ms var(--ease-out) both;
