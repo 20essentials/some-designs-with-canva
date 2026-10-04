@@ -1,6 +1,7 @@
 ---
 import { categories, projects } from '@/utils/taxonomy';
 import { lengthOfProjects } from '@/utils/data';
+import { baseUrl } from '@/utils/functions';
 
 const count = lengthOfProjects;
 const first = projects[0].id;
@@ -15,7 +16,15 @@ const kinds = categories.filter(({ id }) => id !== 'all');
 
   <div class='hero__frame'>
     <header class='hero__top'>
-      <p class='hero__ident'>Archive</p>
+      <div class='hero__brand'>
+        <img
+          src={baseUrl('/assets/canva-isotopic-logo.svg')}
+          alt=''
+          aria-hidden='true'
+          class='hero__logo'
+        />
+        <p class='hero__ident'>Archive</p>
+      </div>
       <p class='hero__range'>
         <span>Nos.</span>
         <span>{first}</span>
@@ -161,6 +170,19 @@ const kinds = categories.filter(({ id }) => id !== 'all');
   .hero__foot {
     padding-top: var(--space-2xs);
     animation: hero-rise 620ms var(--ease-out) 460ms both;
+  }
+
+  .hero__brand {
+    display: inline-flex;
+    align-items: center;
+    gap: clamp(var(--space-3xs), 1vw, var(--space-2xs));
+  }
+
+  .hero__logo {
+    display: block;
+    width: auto;
+    height: clamp(1.25rem, 2.2vw, 1.6rem);
+    opacity: 0.96;
   }
 
   .hero__ident {
