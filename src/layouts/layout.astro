@@ -1,4 +1,6 @@
 ---
+import { Font } from 'astro:assets';
+
 import '@/styles/global.css';
 import FixedBackground from '@/components/fixed-background.astro';
 import { lengthOfProjects } from '@/utils/data';
@@ -26,6 +28,10 @@ const description = `A running archive of ${count} experiments made inside Canva
 
     <link rel='icon' type='image/webp' href={baseUrl('/assets/favicon.webp')} />
     <title>{title}</title>
+
+    <Font cssVariable='--font-instrument-serif' preload />
+    <Font cssVariable='--font-geist' preload />
+    <Font cssVariable='--font-geist-mono' />
 
     <script is:inline>
       document.documentElement.classList.add('js');

@@ -1,348 +1,418 @@
 ---
+import { categories, projects } from '@/utils/taxonomy';
 import { lengthOfProjects } from '@/utils/data';
 
 const count = lengthOfProjects;
+const first = projects[0].id;
+const last = projects[projects.length - 1].id;
+const kinds = categories.filter(({ id }) => id !== 'all');
 ---
 
-<section class='hero'>
-  <div class='hero__bg' aria-hidden='true'></div>
-  <div class='hero__stack'>
-    <div class='hero__chip' aria-label={`${count} designs with Canva`}>
-      <span class='hero__chip-dot'></span>
-      <span class='hero__chip-text'>Go to Canva.com</span>
+<section class='hero' aria-labelledby='hero-title'>
+  <p class='hero__rail' aria-hidden='true'>
+    <span class='hero__rail-text'>Archive of experiments</span>
+  </p>
+
+  <div class='hero__frame'>
+    <header class='hero__top'>
+      <p class='hero__ident'>Archive</p>
+      <p class='hero__range'>
+        <span>Nos.</span>
+        <span>{first}</span>
+        <span aria-hidden='true'>&ndash;</span>
+        <span>{last}</span>
+      </p>
+    </header>
+
+    <div class='hero__body'>
+      <h1 class='hero__title' id='hero-title'>
+        <span class='hero__line'>
+          <span class='hero__line-in'>{count} Designs</span>
+        </span>
+        <span class='hero__line hero__line--inset'>
+          <span class='hero__line-in'>With <em class='hero__accent'>Canva</em></span>
+        </span>
+      </h1>
+
+      <div class='hero__aside'>
+        <p class='hero__lede'>
+          A running archive of experiments made inside Canva. Every tile opens
+          in the editor where it was built.
+        </p>
+
+        <a class='hero__cue' href='#archive'>
+          <span>See the archive</span>
+          <svg viewBox='0 0 12 8' aria-hidden='true' focusable='false'>
+            <path
+              d='M1 1.5 6 6.5l5-5'
+              fill='none'
+              stroke='currentColor'
+              stroke-width='1.6'
+            />
+          </svg>
+        </a>
+      </div>
     </div>
 
-    <h1 class='hero__title'>
-      <span class='hero__line'><span class='hero__word'>{count} Designs With Canva</span></span>
-    </h1>
+    <footer class='hero__foot'>
+      <ul class='hero__kinds'>
+        {
+          kinds.map(({ label, count: total }) => (
+            <li class='hero__kind'>
+              <span>{label}</span>
+              <span class='hero__kind-count'>{total}</span>
+            </li>
+          ))
+        }
+      </ul>
 
-    <p class='hero__lede'>
-      A running archive of experiments made inside Canva. Every tile opens in
-      the editor where it was built.
-    </p>
-
-    <a class='hero__cue' href='#archive'>
-      <span>See the archive</span>
-      <svg viewBox='0 0 12 8' aria-hidden='true' focusable='false'>
-        <path d='M1 1.5 6 6.5l5-5' fill='none' stroke='currentColor' stroke-width='1.6' />
-      </svg>
-    </a>
+      <p class='hero__note'>Filter by kind below</p>
+    </footer>
   </div>
 </section>
 
 <style>
+  /* The hero paints nothing of its own: the fixed WebGL field behind it
+     is the background. Only a scrim, thin enough to stay transparent. */
   .hero {
-    --rim: clamp(0.5px, 0.14vw, 1.5px);
-    --rim-blur: clamp(1px, 0.3vw, 3px);
-
     position: relative;
     display: grid;
-    place-items: center;
     min-height: 100svh;
-    padding: clamp(3rem, 8vh, 6rem) var(--gutter);
-    overflow: clip;
+    isolation: isolate;
   }
 
-  .hero__bg {
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    overflow: hidden;
-  }
-
-  .hero__bg::before,
-  .hero__bg::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-  }
-
-  /* Soft radial mesh: more refined, less saturated */
-  .hero__bg::before {
-    background:
-      radial-gradient(
-        120% 80% at 50% -20%,
-        color-mix(in oklab, var(--violet) 16%, transparent) 0%,
-        transparent 70%
-      ),
-      radial-gradient(
-        90% 60% at 50% 120%,
-        color-mix(in oklab, var(--magenta) 10%, transparent) 0%,
-        transparent 68%
-      ),
-      radial-gradient(
-        60% 40% at 20% 10%,
-        color-mix(in oklab, var(--cyan) 8%, transparent) 0%,
-        transparent 80%
-      ),
-      radial-gradient(
-        60% 40% at 80% 5%,
-        color-mix(in oklab, var(--violet) 8%, transparent) 0%,
-        transparent 80%
-      );
-  }
-
-  /* Subtly textured noise to add depth without grit */
-  .hero__bg::after {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140' viewBox='0 0 140 140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='1' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
-    opacity: 0.08;
-    mix-blend-mode: soft-light;
-    transform: scale(1.05);
-  }
-
-  /* One orchestrated page-load moment: very subtle light leak */
   .hero::before {
     content: '';
     position: absolute;
-    inset: -25% -40%;
-    background: radial-gradient(
-      36% 28% at 50% 50%,
-      color-mix(in oklab, var(--cyan) 20%, transparent) 0%,
-      transparent 72%
-    );
-    opacity: 0;
-    transform: translate3d(-36%, 0, 0) scale(0.8);
-    animation: hero-leak 1500ms var(--ease-out) 80ms both;
+    inset: 0;
+    z-index: -1;
     pointer-events: none;
+    background:
+      radial-gradient(
+        78% 60% at 6% 94%,
+        color-mix(in oklab, var(--ink-deep) 74%, transparent) 0%,
+        transparent 72%
+      ),
+      linear-gradient(
+        to top,
+        color-mix(in oklab, var(--ink-deep) 66%, transparent) 0%,
+        transparent 42%
+      );
   }
 
-  .hero__stack {
-    position: relative;
+  /* Frame: meta rail on top, headline anchored to the lower half,
+     category rail at the bottom. The 1fr row is what creates the
+     asymmetry — the headline sits low, the breathing room sits above. */
+  .hero__frame {
     display: grid;
-    justify-items: center;
-    gap: clamp(1.25rem, 2.8vh, 2.25rem);
-    max-width: 46ch;
-    text-align: center;
+    grid-template-rows: auto 1fr auto;
+    gap: clamp(var(--space-m), 4vh, var(--space-l));
+    width: 100%;
+    max-width: 96rem;
+    min-height: 100svh;
+    margin-inline: auto;
+    padding:
+      clamp(var(--space-l), 8vh, var(--space-xl)) var(--gutter)
+      clamp(var(--space-m), 5vh, var(--space-l));
   }
 
-  /* Pill / chip with the count */
-  .hero__chip {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.45em;
-    padding: 0.38em 0.72em;
-    font-size: 0.78rem;
-    font-weight: 500;
-    letter-spacing: 0.08em;
+  /* Rails ---------------------------------------------------------------- */
+
+  .hero__top,
+  .hero__foot {
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-2xs) var(--space-m);
+    font-family: var(--font-mono);
+    font-size: var(--text-meta);
+    font-weight: 400;
+    letter-spacing: 0.16em;
     text-transform: uppercase;
+    color: var(--paper-dim);
+  }
+
+  .hero__top::after,
+  .hero__foot::before {
+    content: '';
+    position: absolute;
+    inset-inline: 0;
+    height: 1px;
+    background: var(--edge-soft);
+    transform-origin: 0 50%;
+    animation: hero-rule 1000ms var(--ease-out) both;
+  }
+
+  .hero__top::after {
+    bottom: 0;
+  }
+
+  .hero__foot::before {
+    top: 0;
+  }
+
+  .hero__top {
+    padding-bottom: var(--space-2xs);
+    animation: hero-rise 620ms var(--ease-out) 60ms both;
+  }
+
+  .hero__foot {
+    padding-top: var(--space-2xs);
+    animation: hero-rise 620ms var(--ease-out) 460ms both;
+  }
+
+  .hero__ident {
     color: var(--paper);
-    border: 1px solid var(--edge);
-    border-radius: 999px;
-    background: color-mix(in oklab, var(--ink-raised) 64%, transparent);
-    backdrop-filter: blur(8px) saturate(1.1);
-    box-shadow:
-      inset 0 1px 0 color-mix(in oklab, white 10%, transparent),
-      0 1px 1px color-mix(in oklab, var(--ink-deep) 40%, transparent);
-    animation: hero-rise 680ms var(--ease-out) 120ms both;
-    transition:
-      border-color 160ms var(--ease-out),
-      background-color 160ms var(--ease-out),
-      transform 160ms var(--ease-out),
-      box-shadow 160ms var(--ease-out);
+    letter-spacing: 0.2em;
   }
 
-  .hero__chip-dot {
-    width: 0.45em;
-    height: 0.45em;
-    border-radius: 50%;
-    background: radial-gradient(
-        circle at 40% 40%,
-        var(--paper) 0%,
-        color-mix(in oklab, var(--cyan) 60%, transparent) 60%
-      )
-      color-mix(in oklab, var(--cyan) 40%, transparent);
-    box-shadow: 0 0 0 2px color-mix(in oklab, var(--cyan) 28%, transparent);
-  }
-
-  .hero__chip-text {
+  .hero__range {
+    display: inline-flex;
+    gap: 0.6em;
     font-variant-numeric: tabular-nums;
-    letter-spacing: 0.08em;
+  }
+
+  .hero__kinds {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3xs) var(--space-s);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .hero__kind {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.45em;
+    white-space: nowrap;
+  }
+
+  .hero__kind-count {
+    font-variant-numeric: tabular-nums;
+    color: color-mix(in oklab, var(--paper-dim) 55%, transparent);
+  }
+
+  .hero__note {
+    color: color-mix(in oklab, var(--paper-dim) 55%, transparent);
+    white-space: nowrap;
+  }
+
+  /* Body ----------------------------------------------------------------- */
+
+  .hero__body {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: clamp(var(--space-m), 4vh, var(--space-xl));
+    align-content: end;
   }
 
   .hero__title {
-    font-family: var(--font-display);
-    font-size: clamp(2.75rem, 11.5vw, 8.5rem);
-    line-height: 0.96;
-    letter-spacing: -0.01em;
-    color: var(--paper);
     margin: 0;
+    font-family: var(--font-display);
+    font-size: var(--text-display);
+    font-weight: 400;
+    line-height: 0.94;
+    letter-spacing: -0.022em;
+    color: var(--paper);
+    text-wrap: balance;
   }
 
+  /* Each line is its own mask so the headline reveals word by word. */
   .hero__line {
     display: block;
     overflow: hidden;
-    padding-block: 0.02em;
+    padding-block: 0.06em;
+    margin-block: -0.06em;
   }
 
-  .hero__word {
+  .hero__line-in {
     display: block;
-    animation:
-      hero-word 900ms var(--ease-out) both,
-      hero-rim-soft 1100ms var(--ease-out) both;
+    animation: hero-mask 950ms var(--ease-out) both;
   }
 
-  .hero__line .hero__word {
-    animation-delay: 220ms, 220ms;
+  .hero__line:nth-child(1) .hero__line-in {
+    animation-delay: 140ms;
+  }
+
+  .hero__line:nth-child(2) .hero__line-in {
+    animation-delay: 230ms;
+  }
+
+  /* The indent is the asymmetry: the second line hangs off the margin
+     instead of stacking flush under the first. */
+  .hero__line--inset .hero__line-in {
+    margin-left: clamp(0rem, 7vw, 5.5rem);
+  }
+
+  .hero__accent {
+    font-style: italic;
+    color: var(--cyan);
+    animation: hero-tint 800ms var(--ease-out) 700ms both;
+  }
+
+  .hero__aside {
+    display: grid;
+    justify-items: start;
+    gap: var(--space-m);
+    align-content: end;
+    animation: hero-rise 640ms var(--ease-out) 480ms both;
   }
 
   .hero__lede {
-    max-width: 42ch;
-    font-size: clamp(0.98rem, 0.55vw + 0.85rem, 1.15rem);
-    line-height: 1.6;
+    max-width: 38ch;
+    font-size: var(--text-lede);
+    line-height: 1.55;
     color: var(--paper-dim);
-    text-wrap: balance;
-    animation: hero-rise 700ms var(--ease-out) 560ms both;
+    text-wrap: pretty;
   }
 
   .hero__cue {
     display: inline-flex;
     align-items: center;
-    gap: 0.55em;
-    padding: 0.55em 1.08em;
-    font-size: 0.875rem;
+    gap: 0.6em;
+    padding: 0.7em 1.1em;
+    font-size: 0.9375rem;
     font-weight: 500;
-    letter-spacing: 0.02em;
-    color: var(--paper);
-    border: 1px solid var(--edge);
-    border-radius: 999px;
-    background: color-mix(in oklab, var(--ink-raised) 58%, transparent);
-    backdrop-filter: blur(8px) saturate(1.08);
-    transform-origin: 50% 50%;
-    animation: hero-rise 700ms var(--ease-out) 760ms both;
+    letter-spacing: 0.01em;
+    color: var(--ink);
+    background: var(--paper);
+    border-radius: 2px;
     transition:
-      border-color 160ms var(--ease-out),
-      color 160ms var(--ease-out),
-      background-color 160ms var(--ease-out),
-      transform 160ms var(--ease-out),
-      box-shadow 160ms var(--ease-out);
+      transform 180ms var(--ease-out),
+      background-color 180ms var(--ease-out),
+      box-shadow 180ms var(--ease-out);
   }
 
   .hero__cue svg {
-    width: 0.72em;
+    width: 0.7em;
     height: auto;
-    animation: hero-bob 2200ms linear 1500ms infinite;
-    will-change: transform;
+    transition: transform 180ms var(--ease-out);
   }
 
   @media (hover: hover) and (pointer: fine) {
-    .hero__chip:hover {
-      border-color: var(--edge-hot);
-      background: color-mix(in oklab, var(--ink-raised) 72%, transparent);
-      transform: translateY(-1px);
-    }
-
     .hero__cue:hover {
-      border-color: var(--edge-hot);
-      color: var(--cyan);
-      background: color-mix(in oklab, var(--ink-raised) 70%, transparent);
-      transform: translateY(-1px);
-      box-shadow: 0 1px 0 color-mix(in oklab, var(--cyan) 16%, transparent) inset,
-        0 10px 40px -20px color-mix(in oklab, var(--cyan) 40%, transparent);
-    }
-
-    .hero__cue:active {
-      transform: scale(0.96);
+      background: #fff;
+      transform: translate(-3px, -3px);
+      /* Same hard-shadow language as the archive cards. */
+      box-shadow: 5px 5px 0 var(--magenta);
     }
 
     .hero__cue:hover svg {
-      animation-play-state: paused;
       transform: translateY(2px);
     }
-  }
 
-  .hero__cue:focus-visible {
-    border-radius: 999px;
-  }
-
-  @keyframes hero-leak {
-    from {
-      opacity: 0;
-      transform: translate3d(-36%, 0, 0) scale(0.8);
+    .hero__cue:active {
+      transform: translate(0, 0);
+      box-shadow: 1px 1px 0 var(--magenta);
     }
-    40% {
-      opacity: 0.5;
+  }
+
+  /* Margin rail ---------------------------------------------------------- */
+
+  .hero__rail {
+    position: absolute;
+    top: 50%;
+    left: calc(var(--gutter) * 0.26);
+    translate: 0 -50%;
+    pointer-events: none;
+  }
+
+  .hero__rail-text {
+    display: block;
+    writing-mode: vertical-rl;
+    rotate: 180deg;
+    font-family: var(--font-mono);
+    font-size: var(--text-meta);
+    font-weight: 400;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    color: color-mix(in oklab, var(--paper-dim) 50%, transparent);
+  }
+
+  /* Wider viewports get the two-column editorial split: the headline
+     takes the wide measure, the supporting column sits bottom-aligned
+     against it. */
+  @media (min-width: 56em) {
+    .hero__body {
+      grid-template-columns: minmax(0, 1.9fr) minmax(0, 1fr);
+      align-items: end;
+      column-gap: clamp(var(--space-l), 5vw, var(--space-xl));
+    }
+
+    .hero__rail {
+      display: block;
+    }
+  }
+
+  @media (max-width: 55.99em) {
+    .hero__rail {
+      display: none;
+    }
+  }
+
+  @media (max-width: 40em) {
+    .hero__note {
+      display: none;
+    }
+  }
+
+  /* Motion: one orchestrated entrance, ~1.4s, no loops. --------------- */
+
+  @keyframes hero-rule {
+    from {
+      transform: scaleX(0);
     }
     to {
-      opacity: 0;
-      transform: translate3d(36%, 0, 0) scale(1.15);
+      transform: scaleX(1);
     }
   }
 
-  @keyframes hero-word {
+  @keyframes hero-mask {
     from {
-      transform: translate3d(0, 112%, 0);
+      transform: translate3d(0, 108%, 0);
     }
     to {
-      transform: translate3d(0, 0, 0);
-    }
-  }
-
-  /* Softer rim-light, more "glow" than harsh neon */
-  @keyframes hero-rim-soft {
-    from {
-      text-shadow:
-        0 0 0 color-mix(in oklab, var(--cyan) 0%, transparent),
-        0 0 0 color-mix(in oklab, var(--violet) 0%, transparent);
-    }
-    to {
-      text-shadow:
-        0 0.5px 0 color-mix(in oklab, white 12%, transparent) inset,
-        0 -1px 80px color-mix(in oklab, var(--violet) 14%, transparent),
-        0 1px 120px color-mix(in oklab, var(--cyan) 10%, transparent);
+      transform: none;
     }
   }
 
   @keyframes hero-rise {
     from {
       opacity: 0;
-      transform: translate3d(0, 14px, 0);
+      transform: translate3d(0, 12px, 0);
     }
     to {
       opacity: 1;
-      transform: translate3d(0, 0, 0);
+      transform: none;
     }
   }
 
-  @keyframes hero-bob {
-    0%,
-    12% {
-      transform: translateY(0);
+  @keyframes hero-tint {
+    from {
+      color: var(--paper);
     }
-    50% {
-      transform: translateY(3px);
-    }
-    88%,
-    100% {
-      transform: translateY(0);
+    to {
+      color: var(--cyan);
     }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .hero::before,
-    .hero__bg::after {
-      animation: none;
+    .hero__top,
+    .hero__foot,
+    .hero__top::after,
+    .hero__foot::before,
+    .hero__line-in,
+    .hero__aside,
+    .hero__accent {
+      animation: hero-fade 240ms var(--ease-out) both;
     }
 
-    .hero__bg::after {
-      transform: none;
-    }
-
-    .hero__word {
-      animation: hero-fade 260ms var(--ease-out) both;
-    }
-
-    .hero__line .hero__word {
-      animation-delay: 0ms;
-    }
-
-    .hero__chip,
-    .hero__lede,
     .hero__cue {
-      animation: hero-fade 260ms var(--ease-out) both;
-    }
-
-    .hero__cue svg {
-      animation: none;
+      transition-duration: 1ms;
     }
   }
 

@@ -23,21 +23,34 @@
   --gap: clamp(0.7rem, 1.3vw, 1.15rem);
   --bar-height: 4.5rem;
 
-  --font-display: 'Luckiest Guy', 'Arial Black', system-ui, sans-serif;
+  /* Type families. The faces behind these variables are self-hosted and
+     injected by Astro's Fonts API; the stacks below add the last-resort
+     system fallbacks on top. */
+  --font-display:
+    var(--font-instrument-serif), 'Iowan Old Style', 'Times New Roman', serif;
   --font-ui:
-    system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    var(--font-geist), system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono:
+    var(--font-geist-mono), ui-monospace, 'Cascadia Mono', monospace;
+
+  /* Type scale, named by role so components stop inventing sizes. */
+  --text-display: clamp(2.9rem, 8.2vw, 7.5rem);
+  --text-lede: clamp(1rem, 0.35vw + 0.9rem, 1.15rem);
+  --text-body: 0.9375rem;
+  --text-meta: 0.6875rem;
+
+  /* Spacing scale, 4-unit base. */
+  --space-3xs: 0.25rem;
+  --space-2xs: 0.5rem;
+  --space-xs: 0.75rem;
+  --space-s: 1rem;
+  --space-m: 1.5rem;
+  --space-l: 2.5rem;
+  --space-xl: 4rem;
 
   --sb-size: 0.55rem;
   --sb-track-color: var(--ink-deep);
   --sb-thumb-color: var(--violet);
-}
-
-@font-face {
-  font-family: 'Luckiest Guy';
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-  src: url('/assets/luckiest-gay.woff2') format('woff2');
 }
 
 *,
@@ -67,6 +80,7 @@ body {
   line-height: 1.55;
   overflow-x: clip;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
 }
 
